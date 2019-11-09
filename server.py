@@ -9,6 +9,7 @@ A debugger such as "pdb" may be helpful for debugging.
 Read about it online.
 """
 import os
+import flask
   # accessible as a variable in index.html:
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
@@ -161,6 +162,10 @@ def index():
 def another():
   return render_template("another.html")
 
+@app.route('/home')
+def home():
+    filePathToNYImg = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates/NY_google.JPG')
+    return render_template("home.html", NY_google = filePathToNYImg)
 
 # Example of adding new data to the database
 @app.route('/add', methods=['POST'])
