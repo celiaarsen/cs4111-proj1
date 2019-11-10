@@ -7,27 +7,14 @@
   </style>
 
 
-<body>
-  <h1>Some famous Computer Scientists</h1>
+<h1>Late 1800's Census Data Brought to Life</h1>
   
-  <p> The data should be here </p>
+  <p> </p>
+  <p> </p>
   
-  <div>{{data}}</div>
-
-  <div>
-    {% for n in data %}
-    <div>{{n}}</div>
-    {% endfor %}
-  </div>
-
-<p><a href="another">Go to the other page</a></p>
-<p><a href="home">Go to the Home page</a></p>
-
-<form method="POST" action="/add">
-<p>Name of new computer scientist: <input type="text" name="name"> 
-<input type="submit" value="Add"></p>
-</form>
-
+  <p> Enter a search query below based on provided parameters </p>
+  
+  <p> </p>
 
 <form method="POST" action="/select">
 	<p>Select Element(s) to Return:</p>
@@ -37,8 +24,7 @@
 		<option value="Address">Addresses</option>
 		<option value="Education">Education Institutions</option>
 		<option value="Occupation">Occupations</option>
-		<option value="Tran_mode">Modes Of Transportation</option>
-		<option value="All">All</option>
+		<option value="Transport_Mode">Modes Of Transportation</option>
 	</select> 
 <input type="submit" value="Add"></p>
 </form>
@@ -53,12 +39,37 @@
 	<p>With condition(s):</p>
 	
 	<select name="compareClass">
-		<option value="r_id">Resident ID</option>
-		<option value="Ethnicity">Ethnicity</option>
-		<option value="Age">Age</option>
-		<option value="Gender">Gender</option>
-		<option value="Name">Name</option>
-		<option value="All">All</option>
+		
+		<optgroup label="Resident Attributes">
+			{% for i in range(0, lenRA)%}
+			<option value={{rAS[i]}}>{{rAC[i]}}</option>
+			{% endfor %}
+		</optgroup>
+		
+		<optgroup label="Occupation Attributes">
+			{% for i in range(0, lenOA)%}
+			<option value={{oAS[i]}}>{{oAC[i]}}</option>
+			{% endfor %}
+		</optgroup>
+		
+		<optgroup label="Education Attributes">
+			{% for i in range(0, lenEA)%}
+			<option value={{eAS[i]}}>{{eAC[i]}}</option>
+			{% endfor %}
+		</optgroup>
+		
+		<optgroup label="Transportation Attributes">
+			{% for i in range(0, lenTA)%}
+			<option value={{tAS[i]}}>{{tAC[i]}}</option>
+			{% endfor %}
+		</optgroup>
+		
+		<optgroup label="Address Attributes">
+			{% for i in range(0, lenEA)%}
+			<option value={{aAS[i]}}>{{aAC[i]}}</option>
+			{% endfor %}
+		</optgroup>
+	
 	</select>
 	
 	<select name="compareSign">
@@ -82,7 +93,125 @@
 		{% endfor %}
 		</div>
 
+<form method="POST" action="/grouping">
+	<p>Indicate Data Ordering, Grouping, and Number of Records:</p>
+	
+	<select name="groupBy">
+		
+		{% if 'Resident' in selectionsVar %}
+		<optgroup label="Resident Attributes">
+			{% for i in range(0, lenRA)%}
+			<option value={{rAS[i]}}>{{rAC[i]}}</option>
+			{% endfor %}
+		</optgroup>
+		{% endif %}
+		
+		{% if 'Occupation' in selectionsVar %}
+		<optgroup label="Occupation Attributes">
+			{% for i in range(0, lenOA)%}
+			<option value={{oAS[i]}}>{{oAC[i]}}</option>
+			{% endfor %}
+		</optgroup>
+		{% endif %}
+		
+		{% if 'Education' in selectionsVar %}
+		<optgroup label="Education Attributes">
+			{% for i in range(0, lenEA)%}
+			<option value={{eAS[i]}}>{{eAC[i]}}</option>
+			{% endfor %}
+		</optgroup>
+		{% endif %}
+		
+		{% if 'Transport_Mode' in selectionsVar %}
+		<optgroup label="Transportation Attributes">
+			{% for i in range(0, lenTA)%}
+			<option value={{tAS[i]}}>{{tAC[i]}}</option>
+			{% endfor %}
+		</optgroup>
+		{% endif %}
+		
+		{% if 'Address' in selectionsVar %}
+		<optgroup label="Address Attributes">
+			{% for i in range(0, lenEA)%}
+			<option value={{aAS[i]}}>{{aAC[i]}}</option>
+			{% endfor %}
+		</optgroup>
+		{% endif %}
+
+	</select>
+	
+	
+<select name="orderBy">
+		
+		{% if 'Resident' in selectionsVar %}
+		<optgroup label="Resident Attributes">
+			{% for i in range(0, lenRA)%}
+			<option value={{rAS[i]}}>{{rAC[i]}}</option>
+			{% endfor %}
+		</optgroup>
+		{% endif %}
+		
+		{% if 'Occupation' in selectionsVar %}
+		<optgroup label="Occupation Attributes">
+			{% for i in range(0, lenOA)%}
+			<option value={{oAS[i]}}>{{oAC[i]}}</option>
+			{% endfor %}
+		</optgroup>
+		{% endif %}
+		
+		{% if 'Education' in selectionsVar %}
+		<optgroup label="Education Attributes">
+			{% for i in range(0, lenEA)%}
+			<option value={{eAS[i]}}>{{eAC[i]}}</option>
+			{% endfor %}
+		</optgroup>
+		{% endif %}
+		
+		{% if 'Transport_Mode' in selectionsVar %}
+		<optgroup label="Transportation Attributes">
+			{% for i in range(0, lenTA)%}
+			<option value={{tAS[i]}}>{{tAC[i]}}</option>
+			{% endfor %}
+		</optgroup>
+		{% endif %}
+		
+		{% if 'Address' in selectionsVar %}
+		<optgroup label="Address Attributes">
+			{% for i in range(0, lenEA)%}
+			<option value={{aAS[i]}}>{{aAC[i]}}</option>
+			{% endfor %}
+		</optgroup>
+		{% endif %}
+
+	</select>
+	
+	
+	<input type="text" name="numberOfRecords">
+	
+	<input type="submit" value="Submit Query"></p>
+	
+</form>
+
+	<p> </p>
+
+  <div> 
+	<img src= "\static\NY_google.JPG" alt="Overview of NYC">
+  </div>
+  
+ 
+<p><a href="another">Go to the other page</a></p>
+<p><a href="home">Go to the Home page</a></p>
+		
 </body>
 
 
 </html>
+
+<!-- <option value="Ethnicity">Ethnicity</option>
+		<option value="Age">Age</option>
+		<option value="Gender">Gender</option>
+		<option value="Name">Name</option>
+		<option value="All">All</option> -->
+
+
+

@@ -95,6 +95,7 @@ def teardown_request(exception):
 # see for decorators: http://simeonfranklin.com/blog/2012/jul/1/python-decorators-in-12-steps/
 #
 
+
 #DEFINING GLOBAL VARIABLES THAT NEED TO BE PASSED TO HTML TEMPLATE
 
 #create an array called selections to hold all desired return types
@@ -104,6 +105,22 @@ selections = []
 #single condition takes strings 'compareAttr', 'compareSign', 'compareValue
 #for example singleCondition[r_id, = , 5]
 conditionsList = []
+
+#Attribute lists for each entity - SYNTATICAL, words exactly as syntax of sql database
+resAttribsSyn = ['r_id', 'birthplace', 'firstName', 'lastName', 'age', 'gender', 'X', 'Y', 'title']
+ocuAttribsSyn = ['title', 'avg_salary', 'sei'] 
+eduAttribsSyn = ['institute', 'cost', 'grad_year', 'X', 'Y']
+transpoAttribsSyn = ['t_type', 'public_access', 'cost']
+addressAttribsSyn = ['lot_size', 'population', 'street_number', 'city', 'X', 'Y']
+
+#Attribute lists for each entity - COLLOQUIAL, words as users will recognize them
+resAttribsCol = ['Resident ID', 'Birthplace', 'First Name', 'Last Name', 'Age',
+                'Gender', 'Longitude', 'Lattitude', 'Job Title']
+ocuAttribsCol = ['Job Title', 'Average Salary', 'Socio-economic Index'] 
+eduAttribsCol = ['Institute', 'Cost', 'Graduation Year', 'Longitude', 'Lattitude']
+transpoAttribsCol = ['Tranportation Type', 'Public Access (True/False)', 'Cost']
+addressAttribsCol = ['Lot Size', 'Population', 'Street Number & Name', 'City',
+                    'Longitude', 'Lattitude']
 
 
 @app.route('/')
@@ -160,9 +177,13 @@ def index():
   #     {% endfor %}
   #
 
-  print( "\n Creating Context \n")
 
-  context = dict(data = names, selectionsVar = selections, conditionsVar = conditionsList)
+  context = dict(data = names, selectionsVar = selections, conditionsVar = conditionsList,
+                 rAS = resAttribsSyn, rAC = resAttribsCol, lenRA = len(resAttribsSyn),
+                 oAS = ocuAttribsSyn, oAC = ocuAttribsCol, lenOA = len(ocuAttribsSyn),
+                 eAS = eduAttribsSyn, eAC = eduAttribsCol, lenEA = len(eduAttribsSyn),
+                 tAS = transpoAttribsSyn, tAC = transpoAttribsCol, lenTA = len(transpoAttribsSyn),
+                 aAS = addressAttribsSyn, aAC = addressAttribsCol, lenAA = len(addressAttribsSyn))
 
 
   #
@@ -228,13 +249,10 @@ def select1():
   for i in range(0, len(selections)):
         if selection == selections[i]:
             redundant = True
-            print("We didnt go true right\n")
 
   if not redundant:
     selections.append(selection) 
  
-  print("\n show me whats in selections: ", selections)
-
   return redirect('/')
 
 
@@ -250,10 +268,20 @@ def conditions():
     singlecondition.append(request.form['compareValue'])
     conditionsList.append([singlecondition]) 
 
-    for i in range(0, len(conditionsList)):
-        print("\n show me whats in conditions: ", conditionsList[i])
+    return redirect('/')
+
+
+@app.route('/grouping', methods=['POST'])
+def grouping():
+
+    #method needs to be written
+
+    #within this method, the SQL query must be submitted to the database and the results returned
 
     return redirect('/')
+
+
+
 
 
 
@@ -289,3 +317,4 @@ if __name__ == "__main__":
     app.run(host=HOST, port=PORT, debug=debug, threaded=threaded)
 
   run()
+
