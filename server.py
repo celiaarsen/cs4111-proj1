@@ -38,7 +38,11 @@ DATABASEURI = "postgresql://cla2143:1868@35.243.220.243/proj1part2"
 #
 engine = create_engine(DATABASEURI)
 
-#
+#Delete statement deletes all data in test each time app starts
+#or else our table becomes massive because its adding new data everytime server.py is run, as seen below
+
+engine.execute("""DELETE FROM test *;""")
+
 # Example of running queries in your database
 # Note that this will probably not work if you already have a table named 'test' in your database, containing meaningful data. This is only an example showing you how to run queries in your database using SQLAlchemy.
 #
@@ -115,6 +119,8 @@ def index():
     names.append(result['name'])  # can also be accessed using result[0]
   cursor.close()
 
+
+  print("whats in names: ", names)
   #
   # Flask uses Jinja templates, which is an extension to HTML where you can
   # pass data to a template and dynamically generate HTML based on the data
@@ -148,6 +154,8 @@ def index():
   # render_template looks in the templates/ folder for files.
   # for example, the below file reads template/index.html
   #
+
+  #homepage is now set to index
   return render_template("index.html", **context)
 
 #
@@ -158,21 +166,54 @@ def index():
 # Notice that the function name is another() rather than index()
 # The functions for each app.route need to have different names
 #
+
+#Allows web app to route to home page through html
 @app.route('/another')
 def another():
   return render_template("another.html")
 
+
+#Allows web app to route to home page through html
 @app.route('/home')
 def home():
-    filePathToNYImg = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates/NY_google.JPG')
-    return render_template("home.html", NY_google = filePathToNYImg)
+    return render_template("home.html")
+
+#Allows web app to route to index page through html
+@app.route('/index')
+def indexLink():
+  return render_template("index.html")
+
+
+#request.form[] is an array of all forms created in the html templates
+#a dictionary was created above which allows us to parse the array with
+#the name of the form as set in the html docs
+#Currently, all forms are found on the index page with names:
+#'name'
+#"Select1'
 
 # Example of adding new data to the database
 @app.route('/add', methods=['POST'])
 def add():
   name = request.form['name']
   g.conn.execute('INSERT INTO test(name) VALUES (%s)', name)
+
+  print("\n show me whats in name: ", name)
+
   return redirect('/')
+
+#create an array called selections to hold all desired return types
+selections = []
+
+@app.route('/select', methods=['POST'])
+def select1():
+  selection = request.form['Select1']
+  selections.append(selection) 
+
+  print("\n show me whats in selections: ", selections)
+
+  #g.conn.execute('INSERT INTO test(name) VALUES (%s)', name)
+  return redirect('/')
+
 
 
 @app.route('/login')

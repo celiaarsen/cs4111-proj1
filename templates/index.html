@@ -9,6 +9,9 @@
 
 <body>
   <h1>Some famous Computer Scientists</h1>
+  
+  <p> The data should be here </p>
+  
   <div>{{data}}</div>
 
   <div>
@@ -21,8 +24,55 @@
 <p><a href="home">Go to the Home page</a></p>
 
 <form method="POST" action="/add">
-<p>Name of new computer scientist: <input type="text" name="name"> <input type="submit" value="Add"></p>
+<p>Name of new computer scientist: <input type="text" name="name"> 
+<input type="submit" value="Add"></p>
 </form>
+
+
+<form method="POST" action="/select">
+<p>Select Element(s) to Return:</p>
+	<select name="Select1">
+		<option value="Resident">Residents</option>
+		<option value="Address">Addresses</option>
+		<option value="Education">Education Institution</option>
+		<option value="Occupation">Resident</option>
+		<option value="Tran_mode">Mode Of Transportation</option>
+		<option value="All">All</option>
+	</select> 
+<input type="submit" value="Add"></p>
+</form>
+
+
+
+<!--
+
+<form method="POST" action="/select">
+	<p>With condition(s):</p>
+	<select name="Select2">
+		<option value="Resident ID">Resident ID</option>
+		<option value="Ethnicity">Ethnicity</option>
+		<option value="Age">"Age</option>
+		<option value="Gender">Gender</option>
+		<option value="Name">Name</option>
+		<option value="All">All</option>
+	</select>
+	
+	<select name="Compare1">
+		<option value="=">=</option>
+		<option value="<"><</option>
+		<option value=">">></option>
+		<option value="!=">!=</option>
+		<option value="Name">Contains</option>
+		<option value="All">All</option>
+	</select>
+	
+	<input type="text" name="compVal">
+	
+	<input type="submit" value="Submit"></p>
+
+</form>
+
+-->
 
 </body>
 
