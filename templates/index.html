@@ -30,49 +30,57 @@
 
 
 <form method="POST" action="/select">
-<p>Select Element(s) to Return:</p>
+	<p>Select Element(s) to Return:</p>
+	
 	<select name="Select1">
 		<option value="Resident">Residents</option>
 		<option value="Address">Addresses</option>
-		<option value="Education">Education Institution</option>
-		<option value="Occupation">Resident</option>
-		<option value="Tran_mode">Mode Of Transportation</option>
+		<option value="Education">Education Institutions</option>
+		<option value="Occupation">Occupations</option>
+		<option value="Tran_mode">Modes Of Transportation</option>
 		<option value="All">All</option>
 	</select> 
 <input type="submit" value="Add"></p>
 </form>
 
+		<div>
+		{% for n in selectionsVar %}
+		<div>{{n}}</div>
+		{% endfor %}
+		</div>
 
-
-<!--
-
-<form method="POST" action="/select">
+<form method="POST" action="/conditions">
 	<p>With condition(s):</p>
-	<select name="Select2">
-		<option value="Resident ID">Resident ID</option>
+	
+	<select name="compareClass">
+		<option value="r_id">Resident ID</option>
 		<option value="Ethnicity">Ethnicity</option>
-		<option value="Age">"Age</option>
+		<option value="Age">Age</option>
 		<option value="Gender">Gender</option>
 		<option value="Name">Name</option>
 		<option value="All">All</option>
 	</select>
 	
-	<select name="Compare1">
+	<select name="compareSign">
 		<option value="=">=</option>
 		<option value="<"><</option>
 		<option value=">">></option>
 		<option value="!=">!=</option>
-		<option value="Name">Contains</option>
-		<option value="All">All</option>
+		<option value="contains">Contains</option>
+		<option value=" ">All (no conditions)</option>
 	</select>
 	
-	<input type="text" name="compVal">
+	<input type="text" name="compareValue">
 	
-	<input type="submit" value="Submit"></p>
+	<input type="submit" value="Add Condition"></p>
 
 </form>
 
--->
+		<div>
+		{% for n in conditionsVar %}
+		<div>{{n}}</div>
+		{% endfor %}
+		</div>
 
 </body>
 

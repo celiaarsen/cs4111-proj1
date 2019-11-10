@@ -94,6 +94,18 @@ def teardown_request(exception):
 # see for routing: http://flask.pocoo.org/docs/0.10/quickstart/#routing
 # see for decorators: http://simeonfranklin.com/blog/2012/jul/1/python-decorators-in-12-steps/
 #
+
+#DEFINING GLOBAL VARIABLES THAT NEED TO BE PASSED TO HTML TEMPLATE
+
+#create an array called selections to hold all desired return types
+selections = []
+
+#"conditions[]" is a list of singleConditions[]
+#single condition takes strings 'compareAttr', 'compareSign', 'compareValue
+#for example singleCondition[r_id, = , 5]
+conditionsList = []
+
+
 @app.route('/')
 def index():
   """
@@ -120,7 +132,7 @@ def index():
   cursor.close()
 
 
-  print("whats in names: ", names)
+  #print("whats in names: ", names)
   #
   # Flask uses Jinja templates, which is an extension to HTML where you can
   # pass data to a template and dynamically generate HTML based on the data
@@ -147,7 +159,10 @@ def index():
   #     <div>{{n}}</div>
   #     {% endfor %}
   #
-  context = dict(data = names)
+
+  print( "\n Creating Context \n")
+
+  context = dict(data = names, selectionsVar = selections, conditionsVar = conditionsList)
 
 
   #
@@ -201,18 +216,44 @@ def add():
 
   return redirect('/')
 
-#create an array called selections to hold all desired return types
-selections = []
 
+
+#handles selection of return type (first field on index.html)
 @app.route('/select', methods=['POST'])
 def select1():
   selection = request.form['Select1']
-  selections.append(selection) 
 
+  #checks for redundancies in return list
+  redundant = False
+  for i in range(0, len(selections)):
+        if selection == selections[i]:
+            redundant = True
+            print("We didnt go true right\n")
+
+  if not redundant:
+    selections.append(selection) 
+ 
   print("\n show me whats in selections: ", selections)
 
-  #g.conn.execute('INSERT INTO test(name) VALUES (%s)', name)
   return redirect('/')
+
+
+
+#handles selection of condtions, second few fields, on index.html
+@app.route('/conditions', methods=['POST'])
+def conditions():
+
+    singlecondition = []
+
+    singlecondition.append(request.form['compareClass'])
+    singlecondition.append(request.form['compareSign'])
+    singlecondition.append(request.form['compareValue'])
+    conditionsList.append([singlecondition]) 
+
+    for i in range(0, len(conditionsList)):
+        print("\n show me whats in conditions: ", conditionsList[i])
+
+    return redirect('/')
 
 
 
