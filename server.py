@@ -17,6 +17,7 @@ import flask
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
 from flask import Flask, request, render_template, g, redirect, Response
+import re
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
@@ -110,7 +111,7 @@ eduAttribsCol = ['Institute', 'Cost', 'Graduation Year', 'Longitude', 'Lattitude
 transpoAttribsCol = ['Tranportation Type', 'Public Access (True/False)', 'Cost']
 addressAttribsCol = ['Lot Size', 'Population', 'Street Number & Name', 'City',
                     'Longitude', 'Lattitude']
-
+strAttributes = ['r_id']
 #builds SQL query based on user input
 def build_sql_query():
     
@@ -118,7 +119,21 @@ def build_sql_query():
     if(len(conditionsList)==0):
         query = "SELECT * FROM %s limit 10" % ', '.join(selections)
     else:
-        query = "SELECT * FROM {0} limit 10".format(selections[0])
+        print()
+        print()
+        print()
+        print("this is conditionsList: " , conditionsList)
+        print("this is conditionsList at element 0: " , conditionsList[0])
+
+        whereClause = "".join(conditionsList[0])
+        print()
+        print()
+        print()
+        print("whereClause is :" , whereClause)
+        print()
+        print()
+        print()
+        query = "SELECT * FROM %s " % ', '.join(selections) + "WHERE %s limit 10" % "".join(whereClause)
         
     print("what's in selections: ", selections)
     return query
@@ -134,7 +149,7 @@ def execute_sql_query():
       cursor.close()
   
   #for debugging
-  print("whats in queryResult: ", queryResult)
+  #print("whats in queryResult: ", queryResult)
   
   return queryResult
   
@@ -264,12 +279,39 @@ def conditions():
 
     singlecondition.append(request.form['compareClass'])
     singlecondition.append(request.form['compareSign'])
-    singlecondition.append(request.form['compareValue'])
-    conditionsList.append([singlecondition]) 
+    #If the attribute that we are putting the condition on is a string 
+    #in the database, we need single quotes around the compare value
+    if(attribute_is_str(request.form['compareClass'])):
+        singlecondition.append("'"+request.form['compareValue']+"'")
+    else:
+        singlecondition.append(request.form['compareValue'])
+            
+    conditionsList.append(singlecondition) 
+    
+    print("this is the conditions added: ", singlecondition)
 
     return redirect('/')
 
-
+#helper method. Checks if an attribute is a string in the Database
+def attribute_is_str(attribute):
+    print('the compareClass, or attricute is called ' , attribute)
+    sqlQuery_getDataType = "SELECT data_type FROM information_schema.columns"
+    sqlQuery_getDataType += " WHERE table_name = %s" % "".join("'"+selections[0].lower()+"'")
+    sqlQuery_getDataType += " AND column_name = %s" % "".join("'"+attribute+"'")
+    
+    print()
+    print('the sqlQuery_getDataType statement is', sqlQuery_getDataType)
+    
+    cursor = g.conn.execute(sqlQuery_getDataType)
+    attribute_DataType = re.sub('[^A-Za-z0-9]+', '', str(cursor.next()))
+    if(attribute_DataType=="character"):
+        print('datatype was character')
+        return True
+    else:
+        print('datatype was NOT CHAR')
+        print('the datatype was', attribute_DataType)
+        return False
+    
 @app.route('/grouping', methods=['POST'])
 def grouping():
 
