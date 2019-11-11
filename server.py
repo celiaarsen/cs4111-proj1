@@ -111,31 +111,21 @@ eduAttribsCol = ['Institute', 'Cost', 'Graduation Year', 'Longitude', 'Lattitude
 transpoAttribsCol = ['Tranportation Type', 'Public Access (True/False)', 'Cost']
 addressAttribsCol = ['Lot Size', 'Population', 'Street Number & Name', 'City',
                     'Longitude', 'Lattitude']
-strAttributes = ['r_id']
+
+
 #builds SQL query based on user input
-def build_sql_query():
-    
+def build_sql_query():    
     query = ""
     if(len(conditionsList)==0):
         query = "SELECT * FROM %s limit 10" % ', '.join(selections)
     else:
-        print()
-        print()
-        print()
-        print("this is conditionsList: " , conditionsList)
-        print("this is conditionsList at element 0: " , conditionsList[0])
-
+        #print("this is conditionsList: " , conditionsList)
+        #print("this is conditionsList at element 0: " , conditionsList[0])
         whereClause = "".join(conditionsList[0])
-        print()
-        print()
-        print()
-        print("whereClause is :" , whereClause)
-        print()
-        print()
-        print()
+        #print("whereClause is :" , whereClause)
         query = "SELECT * FROM %s " % ', '.join(selections) + "WHERE %s limit 10" % "".join(whereClause)
         
-    print("what's in selections: ", selections)
+    #print("what's in selections: ", selections)
     return query
 
 #executes SQL query on our database!  
@@ -146,13 +136,21 @@ def execute_sql_query():
       cursor = g.conn.execute(build_sql_query())
       for result in cursor:
           queryResult.append(result)  # can also be accessed using result[0]
-      cursor.close()
-  
+      cursor.close() 
   #for debugging
   #print("whats in queryResult: ", queryResult)
   
   return queryResult
-  
+ 
+#takes data that have been selected and makes a list of dictionaries
+def lat_lng_to_list(data):
+    LAT_INDEX = 7
+    LNG_INDEX = 6
+    lat_long_list = []
+    for row in data:
+        location = {'lat':row[LAT_INDEX], 'lng': row[LNG_INDEX]}
+        lat_long_list.append(location)
+    return lat_long_list    
     
 @app.route('/')
 def index():
@@ -169,6 +167,7 @@ def index():
   print(request.args)
   
   queryResult = execute_sql_query()
+  lat_long_data = lat_lng_to_list(queryResult)
       
   #
   # Flask uses Jinja templates, which is an extension to HTML where you can
@@ -201,7 +200,8 @@ def index():
   #selectionsVar is variable name in html
   #selections is variable name in server.py
   #
-  context = dict(data = queryResult, selectionsVar = selections, conditionsVar = conditionsList,
+  context = dict(data = queryResult, points = lat_long_data, selectionsVar = selections, 
+                 conditionsVar = conditionsList,
                  rAS = resAttribsSyn, rAC = resAttribsCol, lenRA = len(resAttribsSyn),
                  oAS = ocuAttribsSyn, oAC = ocuAttribsCol, lenOA = len(ocuAttribsSyn),
                  eAS = eduAttribsSyn, eAC = eduAttribsCol, lenEA = len(eduAttribsSyn),

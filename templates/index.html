@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
   <style>
     body{ 
@@ -7,7 +8,7 @@
   </style>
 
 
-<h1>Late 1800's Census Data Brought to Life</h1>
+<h1>The 1880 Census Data Brought to Life</h1>
   
   <p> </p>
   <p> </p>
@@ -100,6 +101,7 @@
 		{% endfor %}
 		</div>
 
+<!--
 <form method="POST" action="/grouping">
 	<p>Indicate Data Ordering, Grouping, and Number of Records:</p>
 	
@@ -211,18 +213,19 @@
 	</div>
 	
 </form>
-
+ -->
+ 
 <head>
-    <title>Simple Map</title>
+    <title>Mapping the 1880 Census</title>
     <meta name="viewport" content="initial-scale=1.0">
     <meta charset="utf-8">
     <style>
       /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
       #map {
-        height: 100%;
+        height: 80%;
       }
-      /* Optional: Makes the sample page fill the window. */
+      /* Optional: Makes the map fill the window. */
       html, body {
         height: 100%;
         margin: 0;
@@ -233,25 +236,27 @@
   <body>
     <div id="map"></div>
     <script>
-      var map;
+
       function initMap() {
-        map = new google.maps.Map(document.getElementById('map'), {
-          center: {lat: 40.807440, lng: -73.961968},
-          zoom: 13
-        });
+        var columbia = {lat: 40.807440, lng: -73.961968};
+        var map;
+        map = new google.maps.Map(
+            document.getElementById('map'), {center: columbia, zoom: 13});
+        var marker = new google.maps.Marker({
+            position: columbia,
+            map: map,
+            title: 'Hello World!'
+  });             
       }
     </script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCGxQ5Stz1p-ItVk1m1uZV0Xq7LoXE2eEE&callback=initMap"
       type="text/javascript">
     </script>
  
-<p><a href="another">Go to the other page</a></p>
-<p><a href="home">Go to the Home page</a></p>
-		
+ 
 </body>
 
 
 </html>
-
 
 
