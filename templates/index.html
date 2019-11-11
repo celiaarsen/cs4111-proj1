@@ -199,9 +199,15 @@
 	
 	<!--print out data from SQL query-->
 	<div>
-   {% for n in data %}
-   <div>{{n}}</div>
-	{% endfor %}		
+	<table style="width:100%">
+   {% for row in data %}
+       <tr>
+       {% for attribute in row %}
+           <th>{{attribute}}</th>
+       {% endfor %}
+       </tr>
+	{% endfor %}	
+	</table>	
 	</div>
 	
 </form>
