@@ -1,12 +1,15 @@
-
 """
+@author: Celia Arsen and Jack Welsh
+unis: cla2143 and jhw2167
+
 Columbia's COMS W4111.001 Introduction to Databases
-Example Webserver
+Based off of skeleton code by Luis Gravano
+
+1880's NYC Census Webserver
 To run locally:
     python server.py
 Go to http://localhost:8111 in your browser.
-A debugger such as "pdb" may be helpful for debugging.
-Read about it online.
+
 """
 import os
 import flask
@@ -37,20 +40,6 @@ DATABASEURI = "postgresql://cla2143:1868@35.243.220.243/proj1part2"
 # This line creates a database engine that knows how to connect to the URI above.
 #
 engine = create_engine(DATABASEURI)
-
-#Delete statement deletes all data in test each time app starts
-#or else our table becomes massive because its adding new data everytime server.py is run, as seen below
-
-engine.execute("""DELETE FROM test *;""")
-
-# Example of running queries in your database
-# Note that this will probably not work if you already have a table named 'test' in your database, containing meaningful data. This is only an example showing you how to run queries in your database using SQLAlchemy.
-#
-engine.execute("""CREATE TABLE IF NOT EXISTS test (
-  id serial,
-  name text
-);""")
-engine.execute("""INSERT INTO test(name) VALUES ('grace hopper'), ('alan turing'), ('ada lovelace');""")
 
 
 @app.before_request
@@ -122,7 +111,34 @@ transpoAttribsCol = ['Tranportation Type', 'Public Access (True/False)', 'Cost']
 addressAttribsCol = ['Lot Size', 'Population', 'Street Number & Name', 'City',
                     'Longitude', 'Lattitude']
 
+#builds SQL query based on user input
+def build_sql_query():
+    
+    query = ""
+    if(len(conditionsList)==0):
+        query = "SELECT * FROM %s limit 10" % ', '.join(selections)
+    else:
+        query = "SELECT * FROM {0} limit 10".format(selections[0])
+        
+    print("what's in selections: ", selections)
+    return query
 
+#executes SQL query on our database!  
+def execute_sql_query():
+  queryResult = []
+  #only execute query if user has provided input
+  if(len(selections)>0):
+      cursor = g.conn.execute(build_sql_query())
+      for result in cursor:
+          queryResult.append(result)  # can also be accessed using result[0]
+      cursor.close()
+  
+  #for debugging
+  print("whats in queryResult: ", queryResult)
+  
+  return queryResult
+  
+    
 @app.route('/')
 def index():
   """
@@ -134,22 +150,11 @@ def index():
 
   See its API: http://flask.pocoo.org/docs/0.10/api/#incoming-request-data
   """
-
   # DEBUG: this is debugging code to see what request looks like
   print(request.args)
-
-
-  #
-  # example of a database query
-  #
-  cursor = g.conn.execute("SELECT name FROM test")
-  names = []
-  for result in cursor:
-    names.append(result['name'])  # can also be accessed using result[0]
-  cursor.close()
-
-
-  #print("whats in names: ", names)
+  
+  queryResult = execute_sql_query()
+      
   #
   # Flask uses Jinja templates, which is an extension to HTML where you can
   # pass data to a template and dynamically generate HTML based on the data
@@ -177,8 +182,11 @@ def index():
   #     {% endfor %}
   #
 
-
-  context = dict(data = names, selectionsVar = selections, conditionsVar = conditionsList,
+  #data= names is not being used. 
+  #selectionsVar is variable name in html
+  #selections is variable name in server.py
+  #
+  context = dict(data = queryResult, selectionsVar = selections, conditionsVar = conditionsList,
                  rAS = resAttribsSyn, rAC = resAttribsCol, lenRA = len(resAttribsSyn),
                  oAS = ocuAttribsSyn, oAC = ocuAttribsCol, lenOA = len(ocuAttribsSyn),
                  eAS = eduAttribsSyn, eAC = eduAttribsCol, lenEA = len(eduAttribsSyn),
@@ -192,6 +200,7 @@ def index():
   #
 
   #homepage is now set to index
+  #**locals()
   return render_template("index.html", **context)
 
 #
@@ -202,6 +211,8 @@ def index():
 # Notice that the function name is another() rather than index()
 # The functions for each app.route need to have different names
 #
+  
+
 
 #Allows web app to route to home page through html
 @app.route('/another')
@@ -226,18 +237,6 @@ def indexLink():
 #Currently, all forms are found on the index page with names:
 #'name'
 #"Select1'
-
-# Example of adding new data to the database
-@app.route('/add', methods=['POST'])
-def add():
-  name = request.form['name']
-  g.conn.execute('INSERT INTO test(name) VALUES (%s)', name)
-
-  print("\n show me whats in name: ", name)
-
-  return redirect('/')
-
-
 
 #handles selection of return type (first field on index.html)
 @app.route('/select', methods=['POST'])
@@ -279,9 +278,6 @@ def grouping():
     #within this method, the SQL query must be submitted to the database and the results returned
 
     return redirect('/')
-
-
-
 
 
 

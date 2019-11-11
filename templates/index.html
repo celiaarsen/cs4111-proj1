@@ -20,6 +20,7 @@
 	<p>Select Element(s) to Return:</p>
 	
 	<select name="Select1">
+    	<!--when you have a form and a number of boxes,  -->
 		<option value="Resident">Residents</option>
 		<option value="Address">Addresses</option>
 		<option value="Education">Education Institutions</option>
@@ -30,16 +31,22 @@
 </form>
 
 		<div>
+		<!--this is how you print a list in html -->
+		<!--don't need to define selectionsVar earlier on-->
+
 		{% for n in selectionsVar %}
 		<div>{{n}}</div>
 		{% endfor %}
 		</div>
+		
 
 <form method="POST" action="/conditions">
+	<!--this is text-->
 	<p>With condition(s):</p>
 	
 	<select name="compareClass">
-		
+		<!--giving label to sublist of attributes-->
+		<!--for loop going thru all the attributes for Resident-->
 		<optgroup label="Resident Attributes">
 			{% for i in range(0, lenRA)%}
 			<option value={{rAS[i]}}>{{rAC[i]}}</option>
@@ -190,6 +197,13 @@
 	
 	<input type="submit" value="Submit Query"></p>
 	
+	<!--print out data from SQL query-->
+	<div>
+   {% for n in data %}
+   <div>{{n}}</div>
+	{% endfor %}		
+	</div>
+	
 </form>
 
 	<p> </p>
@@ -206,12 +220,6 @@
 
 
 </html>
-
-<!-- <option value="Ethnicity">Ethnicity</option>
-		<option value="Age">Age</option>
-		<option value="Gender">Gender</option>
-		<option value="Name">Name</option>
-		<option value="All">All</option> -->
 
 
 
