@@ -242,27 +242,42 @@
     <div id="map"></div>
     <script>
     <!--this is where we need to access 'points'-->
-      var lat = document.getElementsByClassName("myPoints")[0].innerHTML.split(":")[1]
-      var long = document.getElementsByClassName("myPoints")[0].innerHTML.split(":")[2]
-      var latNum = Number(lat.replace(/[^0-9\.-]+/g,""))
-      var longNum = Number(long.replace(/[^0-9\.-]+/g,""))
-      console.log(latNum)
-      console.log(longNum) 
-      var resLocation = {lat: latNum, lng: longNum}
+      var reslocation = {lat: 40.807440, lng: -73.961968}
       
+      console.log(x)
+      
+      var residents = document.getElementsByClassName("myPoints");
+        for (var i = 0; i < residents.length; i++) {
+            console.log(residents[i].innerHTML)
+            var lat = residents[i].innerHTML.split(":")[1]
+            var long = residents[i].innerHTML.split(":")[2]
+            var latNum = Number(lat.replace(/[^0-9\.-]+/g,""))
+            console.log(latNum)
+            var longNum = Number(long.replace(/[^0-9\.-]+/g,""))
+            console.log(longNum)
+            var location = {lat: latNum, lng: longNum};
+        }
+
+               
+      function makePoints(){
+          var x = document.getElementsByClassName("myPoints")
+          return "Celia"
+      }   
+          
       function initMap() {
         var columbia = {lat: 40.807440, lng: -73.961968};
         var another = {lat: 40.800468, lng: -73.961968};
         var map;
-        map = new google.maps.Map(
-            document.getElementById('map'), {center: columbia, zoom: 13});
+        map = new google.maps.Map(document.getElementById('map'), {
+            center: columbia, zoom: 13});
         
+        var y = makePoints();
+        console.log(y)
         var marker = new google.maps.Marker({
             position: resLocation,
             map: map
             }); 
-                
-                
+                                
       }
       
        
