@@ -214,7 +214,12 @@
 	
 </form>
  -->
- 
+<div>
+		{% for n in points %}
+		<div class="myPoints">{{n}}</div>
+		{% endfor %}
+</div>
+
 <head>
     <title>Mapping the 1880 Census</title>
     <meta name="viewport" content="initial-scale=1.0">
@@ -236,18 +241,31 @@
   <body>
     <div id="map"></div>
     <script>
-
+    <!--this is where we need to access 'points'-->
+      var lat = document.getElementsByClassName("myPoints")[0].innerHTML.split(":")[1]
+      var long = document.getElementsByClassName("myPoints")[0].innerHTML.split(":")[2]
+      var latNum = Number(lat.replace(/[^0-9\.-]+/g,""))
+      var longNum = Number(long.replace(/[^0-9\.-]+/g,""))
+      console.log(latNum)
+      console.log(longNum) 
+      var resLocation = {lat: latNum, lng: longNum}
+      
       function initMap() {
         var columbia = {lat: 40.807440, lng: -73.961968};
+        var another = {lat: 40.800468, lng: -73.961968};
         var map;
         map = new google.maps.Map(
             document.getElementById('map'), {center: columbia, zoom: 13});
+        
         var marker = new google.maps.Marker({
-            position: columbia,
-            map: map,
-            title: 'Hello World!'
-  });             
+            position: resLocation,
+            map: map
+            }); 
+                
+                
       }
+      
+       
     </script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCGxQ5Stz1p-ItVk1m1uZV0Xq7LoXE2eEE&callback=initMap"
       type="text/javascript">

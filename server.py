@@ -199,7 +199,7 @@ def index():
   #data= names is not being used. 
   #selectionsVar is variable name in html
   #selections is variable name in server.py
-  #
+  #NOTE: I CANNOT FIGURE OUT HOW TO ACCESS points IN THE JAVASCRIPT SECTION OF index.html!!!
   context = dict(data = queryResult, points = lat_long_data, selectionsVar = selections, 
                  conditionsVar = conditionsList,
                  rAS = resAttribsSyn, rAC = resAttribsCol, lenRA = len(resAttribsSyn),
