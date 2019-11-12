@@ -241,27 +241,16 @@
   <body>
     <div id="map"></div>
     <script>
-    <!--this is where we need to access 'points'-->
-      
-      /*     
-      var residents = document.getElementsByClassName("myPoints");
-        for (var i = 0; i < residents.length; i++) {
-            console.log(residents[i].innerHTML)
-            var lat = residents[i].innerHTML.split(":")[1]
-            var long = residents[i].innerHTML.split(":")[2]
-            var latNum = Number(lat.replace(/[^0-9\.-]+/g,""))
-            console.log(latNum)
-            var longNum = Number(long.replace(/[^0-9\.-]+/g,""))
-            console.log(longNum)
-            var location = {lat: latNum, lng: longNum};
-        }
-      */
-              
+    /*This part is javascript. All the console.log() statements are for debugging*/  
+         
       function makePoints(){
+          /*access the XY points from the database*/
           var residents = document.getElementsByClassName("myPoints")
           var pointList = []
           console.log(pointList)
           console.log(residents)
+          
+          /*parse out the XY data from residents, which is an HTMLCollection*/
           for(var i=0; i<residents.length; i++){
               var lat = residents[i].innerHTML.split(":")[1]
               var lng = residents[i].innerHTML.split(":")[2]
@@ -287,12 +276,11 @@
           
       function initMap() {
         var columbia = {lat: 40.807440, lng: -73.961968};
-        var another = {lat: 40.800468, lng: -73.961968};
-        var resLocation = {lat: 40.807440, lng: -73.961968}
         var map;
         map = new google.maps.Map(document.getElementById('map'), {
             center: columbia, zoom: 13});
         
+        /*markerXY is an array of dictionaries. Each dict is an XY pair*/
         var markerXY = makePoints();
         console.log(markerXY)
         for(var i=0; i<markerXY.length; i++){
