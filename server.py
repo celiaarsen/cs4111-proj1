@@ -52,12 +52,15 @@ def before_request():
 
   The variable g is globally accessible.
   """
+
   try:
     g.conn = engine.connect()
   except:
     print("uh oh, problem connecting to database")
     import traceback; traceback.print_exc()
     g.conn = None
+
+   
 
 @app.teardown_request
 def teardown_request(exception):
@@ -87,6 +90,9 @@ def teardown_request(exception):
 
 
 #DEFINING GLOBAL VARIABLES THAT NEED TO BE PASSED TO HTML TEMPLATE
+global querySubmitted
+
+querySubmitted = False
 
 #create an array called selections to hold all desired return types
 selections = []
@@ -113,6 +119,7 @@ addressAttribsCol = ['Lot Size', 'Population', 'Street Number & Name', 'City',
                     'Longitude', 'Lattitude']
 
 
+
 #builds SQL query based on user input
 def build_sql_query():    
     query = ""
@@ -128,6 +135,8 @@ def build_sql_query():
     #print("what's in selections: ", selections)
     return query
 
+
+
 #executes SQL query on our database!  
 def execute_sql_query():
   queryResult = []
@@ -142,6 +151,8 @@ def execute_sql_query():
   
   return queryResult
  
+
+
 #takes data that have been selected and makes a list of dictionaries
 def lat_lng_to_list(data):
     LAT_INDEX = 7
@@ -152,6 +163,8 @@ def lat_lng_to_list(data):
         lat_long_list.append(location)
     return lat_long_list    
     
+
+
 @app.route('/')
 def index():
   """
@@ -165,9 +178,37 @@ def index():
   """
   # DEBUG: this is debugging code to see what request looks like
   print(request.args)
-  
-  queryResult = execute_sql_query()
-  lat_long_data = lat_lng_to_list(queryResult)
+
+  print("VALUE OF Qsubmit IS, ", querySubmitted)
+
+  global selections
+  global conditionsList
+  global queryResult
+  global lat_long_data
+
+  #Initialize vars above if statement so context always has data to select
+  queryResult = []
+  lat_long_data = []
+
+  savedSelections = []
+  savedConditionsList = []
+
+  if querySubmitted:
+    queryResult = execute_sql_query()
+    lat_long_data = lat_lng_to_list(queryResult)
+
+    #clears all lists to prepare for next query
+    #but first saves them in case user wants to analyze previous results
+    savedSelections = selections
+    selections = []
+
+    savedConditionsList = conditionsList
+    conditionsList = []
+
+    conditions = []
+
+    #bool must be turned back to false so queries dont run every other time
+    #querySubmitted = False
       
   #
   # Flask uses Jinja templates, which is an extension to HTML where you can
@@ -199,7 +240,6 @@ def index():
   #data= names is not being used. 
   #selectionsVar is variable name in html
   #selections is variable name in server.py
-  #NOTE: I CANNOT FIGURE OUT HOW TO ACCESS points IN THE JAVASCRIPT SECTION OF index.html!!!
   context = dict(data = queryResult, points = lat_long_data, selectionsVar = selections, 
                  conditionsVar = conditionsList,
                  rAS = resAttribsSyn, rAC = resAttribsCol, lenRA = len(resAttribsSyn),
@@ -321,6 +361,23 @@ def grouping():
 
     return redirect('/')
 
+@app.route('/submitQuery', methods=['POST'])
+def submitQueryTrue():
+    querySubmmitted = True
+
+    return redirect('/')
+
+
+@app.route('/loadLastQuery', methods=['POST'])
+def loadLastQuery():
+    
+    if len(savedSelections) > 0:
+        selections = savedSelections
+
+    if len(savedConditionsList) > 0:
+        conditionsList = savedConditionsList
+
+    return redirect('/')
 
 
 @app.route('/login')
