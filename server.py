@@ -125,6 +125,7 @@ addressAttribsCol = ['Lot Size', 'Population', 'Street Number & Name', 'City',
 
 
 
+
 #builds SQL query based on user input
 def build_sql_query():    
     query = ""
@@ -147,12 +148,15 @@ def execute_sql_query():
   queryResult = []
   #only execute query if user has provided input
   if(len(selections)>0):
+
+      print("\n\n show me the query: ", build_sql_query())
+
       cursor = g.conn.execute(build_sql_query())
       for result in cursor:
           queryResult.append(result)  # can also be accessed using result[0]
       cursor.close() 
   #for debugging
-  #print("whats in queryResult: ", queryResult)
+  print("whats in queryResult: ", queryResult)
   
   return queryResult
  
@@ -160,12 +164,33 @@ def execute_sql_query():
 
 #takes data that have been selected and makes a list of dictionaries
 def lat_lng_to_list(data):
-    LAT_INDEX = 7
-    LNG_INDEX = 6
-    lat_long_list = []
-    for row in data:
-        location = {'lat':row[LAT_INDEX], 'lng': row[LNG_INDEX]}
-        lat_long_list.append(location)
+
+    global selections
+
+    if (selections[0] == "Resident"):
+        LAT_INDEX = 7
+        LNG_INDEX = 6
+        lat_long_list = []
+        for row in data:
+            location = {'lat':row[LAT_INDEX], 'lng': row[LNG_INDEX]}
+            lat_long_list.append(location)
+    elif (selections[0] == "Address"):
+        LAT_INDEX = 5
+        LNG_INDEX = 4
+        lat_long_list = []
+        for row in data:
+            location = {'lat':row[LAT_INDEX], 'lng': row[LNG_INDEX]}
+            lat_long_list.append(location)
+    elif (selections[0] == "Education"):
+        LAT_INDEX = 2
+        LNG_INDEX = 1
+        lat_long_list = []
+        for row in data:
+            location = {'lat':row[LAT_INDEX], 'lng': row[LNG_INDEX]}
+            lat_long_list.append(location)
+    else:
+        lat_long_list = []
+
     return lat_long_list    
 
 
@@ -201,19 +226,13 @@ def index():
     lat_long_data = lat_lng_to_list(queryResult)
 
 
-    print("Whats in Select and conditions:", selections)
-    print("\n\n Whats in Selct and contions: ", conditionsList)
-
     #clears all lists to prepare for next query
     #but first saves them in case user wants to analyze previous results
-    savedSelections = selections
+    savedSelections = selections.copy()
     selections = []
 
-    savedConditionsList = conditionsList
+    savedConditionsList = conditionsList.copy()
     conditionsList = []
-
-    print("Whats in savedSelect and conditions:", savedSelections)
-    print("\n\n Whats in savedSelct and contions: ", savedConditionsList)
 
     #bool must be turned back to false so queries dont run every other time
     querySubmitted = False
@@ -245,11 +264,13 @@ def index():
   #     {% endfor %}
   #
 
+  print("\n\n Whats in saved selections?")
+
   #data= names is not being used. 
   #selectionsVar is variable name in html
   #selections is variable name in server.py
   context = dict(data = queryResult, points = lat_long_data, selectionsVar = selections, 
-                 conditionsVar = conditionsList,
+                 conditionsVar = conditionsList, savedSelectionsVar = savedSelections,
                  rAS = resAttribsSyn, rAC = resAttribsCol, lenRA = len(resAttribsSyn),
                  oAS = ocuAttribsSyn, oAC = ocuAttribsCol, lenOA = len(ocuAttribsSyn),
                  eAS = eduAttribsSyn, eAC = eduAttribsCol, lenEA = len(eduAttribsSyn),
@@ -373,8 +394,10 @@ def grouping():
 def submitQueryTrue():
 
     global querySubmitted
+    global selections
 
-    querySubmitted = True
+    if (len(selections) > 0):
+        querySubmitted = True
 
     return redirect('/')
 

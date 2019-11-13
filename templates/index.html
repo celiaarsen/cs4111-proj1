@@ -115,8 +115,159 @@
 		<div>{{n}}</div>
 		{% endfor %}
 		</div>
+	
+	<!--print out data from SQL query-->
+	<div>
+	<table style="width:100%">
+	
+	<!-- Adds Header row-->
+	
+	
+		{% if 'Resident' in savedSelectionsVar %}
+			{% for i in range(0, lenRA)%}
+			<th>{{rAC[i]}}</th>
+			{% endfor %}
+		{% endif %}
+		
+		{% if 'Occupation' in savedSelectionsVar %}
+			{% for i in range(0, lenOA)%}
+			<th>{{oAC[i]}}</th>
+			{% endfor %}
+		{% endif %}
+		
+		{% if 'Education' in savedSelectionsVar %}
+			{% for i in range(0, lenEA)%}
+			<th>{{eAC[i]}}</th>
+			{% endfor %}
+		{% endif %}
+		
+		{% if 'Transport_Mode' in savedSelectionsVar %}
+			{% for i in range(0, lenTA)%}
+			<th>{{tAC[i]}}</th>
+			{% endfor %}
+		{% endif %}
+		
+		{% if 'Address' in savedSelectionsVar %}
+			{% for i in range(0, lenEA)%}
+			<th>{{aAC[i]}}</th>
+			{% endfor %}
+		{% endif %}
+	
+	
+   {% for row in data %}
+       <tr>
+       {% for attribute in row %}
+           <th>{{attribute}}</th>
+       {% endfor %}
+       </tr>
+	{% endfor %}	
+	</table>	
+	</div>
+	
+</form>
 
-<!--
+<p> </p>
+<p> </p>
+<p> </p>
+
+ <!--
+ 
+<div>
+		{% for n in points %}
+		<div class="myPoints">{{n}}</div>
+		{% endfor %}
+</div>
+
+-->
+
+<head>
+    <title>Mapping the 1880 Census</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 80%;
+      }
+      /* Optional: Makes the map fill the window. */
+      html, body {
+        height: 80%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script>
+    /*This part is javascript. All the console.log() statements are for debugging*/  
+         
+      function makePoints(){
+          /*access the XY points from the database*/
+          var residents = document.getElementsByClassName("myPoints")
+          var pointList = []
+          <!--console.log(pointList)
+          <!--console.log(residents)
+          
+          /*parse out the XY data from residents, which is an HTMLCollection*/
+          for(var i=0; i<residents.length; i++){
+              var lat = residents[i].innerHTML.split(":")[1]
+              var lng = residents[i].innerHTML.split(":")[2]
+              
+              <!--console.log(lat) 
+              <!--console.log(lng) 
+              
+              var latNum = Number(lat.replace(/[^0-9\.-]+/g,""))
+              var lngNum = Number(lng.replace(/[^0-9\.-]+/g,""))
+              
+              <!--console.log(latNum)
+              <!--console.log(lngNum)
+              
+              var residentXY = {lat: latNum, lng: lngNum}
+              <!--console.log(residentXY)
+              
+              pointList.push(residentXY)
+              <!--console.log(pointList)
+         
+          }
+          return pointList
+      }   
+          
+      function initMap() {
+        var columbia = {lat: 40.807440, lng: -73.961968};
+        var map;
+        map = new google.maps.Map(document.getElementById('map'), {
+            center: columbia, zoom: 13});
+        
+        /*markerXY is an array of dictionaries. Each dict is an XY pair*/
+        var markerXY = makePoints();
+        <!--console.log(markerXY)
+        for(var i=0; i<markerXY.length; i++){
+            var marker = new google.maps.Marker({
+                position: markerXY[i],
+                map: map
+            }); 
+        }
+                                
+      }
+      
+       
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCGxQ5Stz1p-ItVk1m1uZV0Xq7LoXE2eEE&callback=initMap"
+      type="text/javascript">
+    </script>
+ 
+ 
+</body>
+
+
+</html>
+
+
+
+<!-- Might be useful...
+
 <form method="POST" action="/grouping">
 	<p>Indicate Data Ordering, Grouping, and Number of Records:</p>
 	
@@ -213,110 +364,5 @@
 	<input type="text" name="numberOfRecords">
 	
 	<input type="submit" value="Submit Query"></p>
-	
-	<!--print out data from SQL query-->
-	<div>
-	<table style="width:100%">
-   {% for row in data %}
-       <tr>
-       {% for attribute in row %}
-           <th>{{attribute}}</th>
-       {% endfor %}
-       </tr>
-	{% endfor %}	
-	</table>	
-	</div>
-	
-</form>
- -->
-<div>
-		{% for n in points %}
-		<div class="myPoints">{{n}}</div>
-		{% endfor %}
-</div>
-
-<head>
-    <title>Mapping the 1880 Census</title>
-    <meta name="viewport" content="initial-scale=1.0">
-    <meta charset="utf-8">
-    <style>
-      /* Always set the map height explicitly to define the size of the div
-       * element that contains the map. */
-      #map {
-        height: 80%;
-      }
-      /* Optional: Makes the map fill the window. */
-      html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="map"></div>
-    <script>
-    /*This part is javascript. All the console.log() statements are for debugging*/  
-         
-      function makePoints(){
-          /*access the XY points from the database*/
-          var residents = document.getElementsByClassName("myPoints")
-          var pointList = []
-          console.log(pointList)
-          console.log(residents)
-          
-          /*parse out the XY data from residents, which is an HTMLCollection*/
-          for(var i=0; i<residents.length; i++){
-              var lat = residents[i].innerHTML.split(":")[1]
-              var lng = residents[i].innerHTML.split(":")[2]
-              
-              console.log(lat) 
-              console.log(lng) 
-              
-              var latNum = Number(lat.replace(/[^0-9\.-]+/g,""))
-              var lngNum = Number(lng.replace(/[^0-9\.-]+/g,""))
-              
-              console.log(latNum)
-              console.log(lngNum)
-              
-              var residentXY = {lat: latNum, lng: lngNum}
-              console.log(residentXY)
-              
-              pointList.push(residentXY)
-              console.log(pointList)
-         
-          }
-          return pointList
-      }   
-          
-      function initMap() {
-        var columbia = {lat: 40.807440, lng: -73.961968};
-        var map;
-        map = new google.maps.Map(document.getElementById('map'), {
-            center: columbia, zoom: 13});
-        
-        /*markerXY is an array of dictionaries. Each dict is an XY pair*/
-        var markerXY = makePoints();
-        console.log(markerXY)
-        for(var i=0; i<markerXY.length; i++){
-            var marker = new google.maps.Marker({
-                position: markerXY[i],
-                map: map
-            }); 
-        }
-                                
-      }
-      
-       
-    </script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCGxQ5Stz1p-ItVk1m1uZV0Xq7LoXE2eEE&callback=initMap"
-      type="text/javascript">
-    </script>
- 
- 
-</body>
-
-
-</html>
 
 
