@@ -90,17 +90,22 @@ def teardown_request(exception):
 
 
 #DEFINING GLOBAL VARIABLES THAT NEED TO BE PASSED TO HTML TEMPLATE
-global querySubmitted
+#global querySubmitted
 
 querySubmitted = False
 
+queryResult = []
+lat_long_data = []
+
 #create an array called selections to hold all desired return types
 selections = []
+savedSelections = []
 
 #"conditions[]" is a list of singleConditions[]
 #single condition takes strings 'compareAttr', 'compareSign', 'compareValue
 #for example singleCondition[r_id, = , 5]
 conditionsList = []
+savedConditionsList = []
 
 #Attribute lists for each entity - SYNTATICAL, words exactly as syntax of sql database
 resAttribsSyn = ['r_id', 'birthplace', 'firstName', 'lastName', 'age', 'gender', 'X', 'Y', 'title']
@@ -162,7 +167,7 @@ def lat_lng_to_list(data):
         location = {'lat':row[LAT_INDEX], 'lng': row[LNG_INDEX]}
         lat_long_list.append(location)
     return lat_long_list    
-    
+
 
 
 @app.route('/')
@@ -179,23 +184,25 @@ def index():
   # DEBUG: this is debugging code to see what request looks like
   print(request.args)
 
-  print("VALUE OF Qsubmit IS, ", querySubmitted)
+  global querySubmitted
 
   global selections
   global conditionsList
   global queryResult
   global lat_long_data
+  global savedConditionsList
+  global savedSelections
+
 
   #Initialize vars above if statement so context always has data to select
-  queryResult = []
-  lat_long_data = []
-
-  savedSelections = []
-  savedConditionsList = []
 
   if querySubmitted:
     queryResult = execute_sql_query()
     lat_long_data = lat_lng_to_list(queryResult)
+
+
+    print("Whats in Select and conditions:", selections)
+    print("\n\n Whats in Selct and contions: ", conditionsList)
 
     #clears all lists to prepare for next query
     #but first saves them in case user wants to analyze previous results
@@ -205,10 +212,11 @@ def index():
     savedConditionsList = conditionsList
     conditionsList = []
 
-    conditions = []
+    print("Whats in savedSelect and conditions:", savedSelections)
+    print("\n\n Whats in savedSelct and contions: ", savedConditionsList)
 
     #bool must be turned back to false so queries dont run every other time
-    #querySubmitted = False
+    querySubmitted = False
       
   #
   # Flask uses Jinja templates, which is an extension to HTML where you can
@@ -363,7 +371,10 @@ def grouping():
 
 @app.route('/submitQuery', methods=['POST'])
 def submitQueryTrue():
-    querySubmmitted = True
+
+    global querySubmitted
+
+    querySubmitted = True
 
     return redirect('/')
 
@@ -371,6 +382,11 @@ def submitQueryTrue():
 @app.route('/loadLastQuery', methods=['POST'])
 def loadLastQuery():
     
+    global selections
+    global conditionsList
+    global savedConditionsList
+    global savedSelections
+
     if len(savedSelections) > 0:
         selections = savedSelections
 
