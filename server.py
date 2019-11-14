@@ -92,7 +92,11 @@ def teardown_request(exception):
 #DEFINING GLOBAL VARIABLES THAT NEED TO BE PASSED TO HTML TEMPLATE
 #global querySubmitted
 
+#warning sent to users when they attempt to do something bad
+warning = ""
 querySubmitted = False
+limter = ""
+orderBy = ""
 
 queryResult = []
 lat_long_data = []
@@ -116,7 +120,7 @@ entities = ['Resident', 'Address', 'Education', 'Occupation', 'Transport_Mode']
 #Attribute lists for each entity - SYNTATICAL, words exactly as syntax of sql database
 resAttribsSyn = ['*', 'r_id', 'birthplace', 'firstName', 'lastName', 'age', 'gender', 'X', 'Y', 'title']
 ocuAttribsSyn = ['*', 'title', 'avg_salary', 'sei'] 
-eduAttribsSyn = ['*', 'institute', 'cost', 'grad_year', 'X', 'Y']
+eduAttribsSyn = ['*', 'institute', 'X', 'Y', 'cost']
 transpoAttribsSyn = ['*', 't_type', 'public_access', 'cost']
 addressAttribsSyn = ['*', 'lot_size', 'population', 'street_number', 'city', 'X', 'Y']
 
@@ -128,9 +132,9 @@ attribsSynList = {entities[0] : resAttribsSyn, entities[1] : ocuAttribsSyn,
 
 #Attribute lists for each entity - COLLOQUIAL, words as users will recognize them
 resAttribsCol = ['All', 'Resident ID', 'Birthplace', 'First Name', 'Last Name', 'Age',
-                'Gender', 'Longitude', 'Lattitude', 'Job Title']
+                'Gender(1,2)', 'Longitude', 'Lattitude', 'Job Title']
 ocuAttribsCol = ['All', 'Job Title', 'Average Salary', 'Socio-economic Index'] 
-eduAttribsCol = ['All',  'Institute', 'Cost', 'Graduation Year', 'Longitude', 'Lattitude']
+eduAttribsCol = ['All',  'Institute', 'Longitude', 'Lattitude', 'Cost']
 transpoAttribsCol = ['All',  'Tranportation Type', 'Public Access (True/False)', 'Cost']
 addressAttribsCol = [ 'All', 'Lot Size', 'Population', 'Street Number & Name', 'City',
                     'Longitude', 'Lattitude']
@@ -142,35 +146,55 @@ addressAttribsCol = [ 'All', 'Lot Size', 'Population', 'Street Number & Name', '
 def build_sql_query():
 
     global conditionsList
+    global selections
+    global specificSelections
+    global orderBy
+    global limiter
 
 
     #SELECTION statement
     query = "SELECT "
 
-    query += attributeSelection
+    selectStar = False
 
-    if(len(conditionsList)==0):
-        query = "SELECT * FROM %s limit 10" % ', '.join(selections)
+    for i in range(0, len(specificSelections)):
+         if specificSelections[i] == "*":
+             selectStar = True
+
+    if selectStar:
+        query += "*"
     else:
+        for i  in range(0, len(specificSelections)):
+            query += selections[i] + "." + specificSelections[i] + " "
+    
+    print("\n\n query after selection: ", query)
+
+    #FROM statement
+
+    query += " FROM %s" % ','.join(selections)
+
+    print("\n\n query after From: ", query)
+
+    #WHERE condition
+
+    if(len(conditionsList) > 0):
+
         #print("this is conditionsList: " , conditionsList)
         #print("this is conditionsList at element 0: " , conditionsList[0])
 
-       
+        query += " WHERE "
 
+        for i in range(0, len(conditionsList)):
+             if i > 0:
+                query += "AND "
 
-        #FROM statement
+             query+= "".join(conditionsList[i])
 
-
-        whereClauses = []
-        totalConditions = len(conditionsList) / 3
-
-        for i in range(0, totalConditions):
-            whereClauses[i] = "".join(conditionsList[0])
-
-        #print("whereClause is :" , whereClause)
-        query = "SELECT * FROM %s " % ', '.join(selections) + "WHERE %s limit 10" % "".join(whereClause)
+    query += " ORDER BY " + orderBy + " limit " + limiter
         
-    #print("what's in selections: ", selections)
+
+    print("\n\n query after WHERE: ", query)
+
     return query
 
 
@@ -181,14 +205,16 @@ def execute_sql_query():
   #only execute query if user has provided input
   if(len(selections)>0):
 
-      print("\n\n show me the query: ", build_sql_query())
+      query = build_sql_query()
 
-      cursor = g.conn.execute("SELECT * FROM Resident limit 10")
+      print("\n\n show me the query: ", query)
+
+      cursor = g.conn.execute(query)
       for result in cursor:
           queryResult.append(result)  # can also be accessed using result[0]
       cursor.close() 
   #for debugging
-  print("whats in queryResult: ", queryResult)
+  #print("whats in queryResult: ", queryResult)
   
   return queryResult
  
@@ -199,21 +225,21 @@ def lat_lng_to_list(data):
 
     global selections
 
-    if (selections[0] == "Resident"):
+    if (selections[0] == "Resident") and (specificSelections[0] == "*") :
         LAT_INDEX = 7
         LNG_INDEX = 6
         lat_long_list = []
         for row in data:
             location = {'lat':row[LAT_INDEX], 'lng': row[LNG_INDEX]}
             lat_long_list.append(location)
-    elif (selections[0] == "Address"):
+    elif (selections[0] == "Address") and (specificSelections[0] == "*") :
         LAT_INDEX = 5
         LNG_INDEX = 4
         lat_long_list = []
         for row in data:
             location = {'lat':row[LAT_INDEX], 'lng': row[LNG_INDEX]}
             lat_long_list.append(location)
-    elif (selections[0] == "Education"):
+    elif (selections[0] == "Education") and (specificSelections[0] == "*") :
         LAT_INDEX = 2
         LNG_INDEX = 1
         lat_long_list = []
@@ -300,7 +326,8 @@ def index():
   #     {% endfor %}
   #
 
-  print("\n\n Whats in saved selections?")
+  #print("\n\n Whats in selVarLen, selections, specificSelections?",
+        #selections, specificSelections, len(selections))
 
   #data= names is not being used. 
   #selectionsVar is variable name in html
@@ -362,9 +389,14 @@ def indexLink():
 #handles selection of return type (first field on index.html)
 @app.route('/select', methods=['POST'])
 def select1():
-  selection = request.form['Select1']
 
-  specificSelection = request.form['Select2']
+  global selections
+  global specificSelections
+  global attribsSynList
+
+  selection = request.form['select1']
+
+  specificSelection = request.form['select2']
 
   #checks for redundancies in return list
   redundant = False
@@ -378,12 +410,16 @@ def select1():
 
   compatibleAttribue = False
 
+  #print("\n\n attrib selections list: ", attribsSynList )
+  #print("\n\n and at index: ", attribsSynList[selection])
+
   for i in range(0,len(attribsSynList[selection])):
     if specificSelection == attribsSynList[selection][i]:
         compatibleAttribue = True
+       #print("\n\n it is a compatible attribute")
 
 
-  if not redundant and compatibleAttribue:
+  if (not redundant) and compatibleAttribue:
     selections.append(selection)
     specificSelections.append(specificSelection)
  
@@ -408,24 +444,24 @@ def conditions():
             
     conditionsList.append(singlecondition) 
     
-    print("this is the conditions added: ", singlecondition)
+    #print("this is the conditions added: ", singlecondition)
 
     return redirect('/')
 
 #helper method. Checks if an attribute is a string in the Database
 def attribute_is_str(attribute):
-    print('the compareClass, or attricute is called ' , attribute)
+    #print('the compareClass, or attricute is called ' , attribute)
     sqlQuery_getDataType = "SELECT data_type FROM information_schema.columns"
     sqlQuery_getDataType += " WHERE table_name = %s" % "".join("'"+selections[0].lower()+"'")
     sqlQuery_getDataType += " AND column_name = %s" % "".join("'"+attribute+"'")
     
     print()
-    print('the sqlQuery_getDataType statement is', sqlQuery_getDataType)
+    #print('the sqlQuery_getDataType statement is', sqlQuery_getDataType)
     
     cursor = g.conn.execute(sqlQuery_getDataType)
     attribute_DataType = re.sub('[^A-Za-z0-9]+', '', str(cursor.next()))
     if(attribute_DataType=="character"):
-        print('datatype was character')
+        #print('datatype was character')
         return True
     else:
         print('datatype was NOT CHAR')
@@ -446,9 +482,14 @@ def submitQueryTrue():
 
     global querySubmitted
     global selections
+    global orderBy
+    global limiter
 
     if (len(selections) > 0):
         querySubmitted = True
+
+    orderBy = request.form['orderBy']
+    limiter = request.form['numberOfRecords']
 
     return redirect('/')
 

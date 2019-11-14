@@ -20,7 +20,7 @@
 <form method="POST" action="/select">
 	<p>Select Element(s) to Return:</p>
 	
-	<select name="Select1">
+	<select name="select1">
     	<!--when you have a form and a number of boxes,  -->
 		<option value="Resident">Residents</option>
 		<option value="Address">Addresses</option>
@@ -77,7 +77,7 @@
 		<!--don't need to define selectionsVar earlier on-->
 
 		{% for i in range(0,selVarLen) %}
-		<div>{{selectionsVar[i]}} - {{specificSelectionsVar[i]}}</div>
+		<div>{{selectionsVar[i]}} | {{specificSelectionsVar[i]}}</div>
 		{% endfor %}
 		</div>
 		
@@ -138,8 +138,71 @@
 
 </form>
 
+
+<div>
+		{% for n in conditionsVar %}
+		<div>{{n}}</div>
+		{% endfor %}
+		</div>
+
+
+
 <form method="POST" action="/submitQuery">
 
+	<p> Order Results By: </p>
+
+	<select name="orderBy">
+		
+		{% if 'Resident' in selectionsVar %}
+		<optgroup label="Resident Attributes">
+			{% for i in range(1, lenRA)%}
+			<option value={{rAS[i]}}>{{rAC[i]}}</option>
+			{% endfor %}
+		</optgroup>
+		{% endif %}
+		
+		{% if 'Occupation' in selectionsVar %}
+		<optgroup label="Occupation Attributes">
+			{% for i in range(1, lenOA)%}
+			<option value={{oAS[i]}}>{{oAC[i]}}</option>
+			{% endfor %}
+		</optgroup>
+		{% endif %}
+		
+		{% if 'Education' in selectionsVar %}
+		<optgroup label="Education Attributes">
+			{% for i in range(1, lenEA)%}
+			<option value={{eAS[i]}}>{{eAC[i]}}</option>
+			{% endfor %}
+		</optgroup>
+		{% endif %}
+		
+		{% if 'Transport_Mode' in selectionsVar %}
+		<optgroup label="Transportation Attributes">
+			{% for i in range(1, lenTA)%}
+			<option value={{tAS[i]}}>{{tAC[i]}}</option>
+			{% endfor %}
+		</optgroup>
+		{% endif %}
+		
+		{% if 'Address' in selectionsVar %}
+		<optgroup label="Address Attributes">
+			{% for i in range(1, lenEA)%}
+			<option value={{aAS[i]}}>{{aAC[i]}}</option>
+			{% endfor %}
+		</optgroup>
+		{% endif %}
+
+	</select>
+	
+	<p> </p>
+	
+	<p>Number of records: 1-500</p> <input type="range" name="numberOfRecords"
+						min = "1" max = "500"> <p>
+
+	<p> </p>
+	
+						
 	<input type="submit" value="Submit Query">
 	
 </form>
@@ -152,12 +215,6 @@
 </form>
 
 
-
-		<div>
-		{% for n in conditionsVar %}
-		<div>{{n}}</div>
-		{% endfor %}
-		</div>
 	
 	<!--print out data from SQL query-->
 	<div>
@@ -209,11 +266,11 @@
 	
 </form>
 
-<p> </p>
-<p> </p>
-<p> </p>
+<div> </div>
+<div> </div>
+<div> </div>
 
- <!--
+ 
  
 <div>
 		{% for n in points %}
@@ -221,7 +278,7 @@
 		{% endfor %}
 </div>
 
--->
+
 
 <head>
     <title>Mapping the 1880 Census</title>
@@ -250,16 +307,16 @@
           /*access the XY points from the database*/
           var residents = document.getElementsByClassName("myPoints")
           var pointList = []
-          <!--console.log(pointList)
-          <!--console.log(residents)
+          console.log(pointList)
+          console.log(residents)
           
           /*parse out the XY data from residents, which is an HTMLCollection*/
           for(var i=0; i<residents.length; i++){
               var lat = residents[i].innerHTML.split(":")[1]
               var lng = residents[i].innerHTML.split(":")[2]
               
-              <!--console.log(lat) 
-              <!--console.log(lng) 
+              console.log(lat) 
+              console.log(lng) 
               
               var latNum = Number(lat.replace(/[^0-9\.-]+/g,""))
               var lngNum = Number(lng.replace(/[^0-9\.-]+/g,""))
@@ -285,7 +342,7 @@
         
         /*markerXY is an array of dictionaries. Each dict is an XY pair*/
         var markerXY = makePoints();
-        <!--console.log(markerXY)
+        console.log(markerXY)
         for(var i=0; i<markerXY.length; i++){
             var marker = new google.maps.Marker({
                 position: markerXY[i],
