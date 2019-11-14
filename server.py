@@ -98,8 +98,12 @@ queryResult = []
 lat_long_data = []
 
 #create an array called selections to hold all desired return types
+#specificSelections stores specific attribute return types
+#savedSelections allows for loading last query
 selections = []
+specificSelections = []
 savedSelections = []
+savedSpecificSelections = []
 
 #"conditions[]" is a list of singleConditions[]
 #single condition takes strings 'compareAttr', 'compareSign', 'compareValue
@@ -107,34 +111,62 @@ savedSelections = []
 conditionsList = []
 savedConditionsList = []
 
+entities = ['Resident', 'Address', 'Education', 'Occupation', 'Transport_Mode']
+
 #Attribute lists for each entity - SYNTATICAL, words exactly as syntax of sql database
-resAttribsSyn = ['r_id', 'birthplace', 'firstName', 'lastName', 'age', 'gender', 'X', 'Y', 'title']
-ocuAttribsSyn = ['title', 'avg_salary', 'sei'] 
-eduAttribsSyn = ['institute', 'cost', 'grad_year', 'X', 'Y']
-transpoAttribsSyn = ['t_type', 'public_access', 'cost']
-addressAttribsSyn = ['lot_size', 'population', 'street_number', 'city', 'X', 'Y']
+resAttribsSyn = ['*', 'r_id', 'birthplace', 'firstName', 'lastName', 'age', 'gender', 'X', 'Y', 'title']
+ocuAttribsSyn = ['*', 'title', 'avg_salary', 'sei'] 
+eduAttribsSyn = ['*', 'institute', 'cost', 'grad_year', 'X', 'Y']
+transpoAttribsSyn = ['*', 't_type', 'public_access', 'cost']
+addressAttribsSyn = ['*', 'lot_size', 'population', 'street_number', 'city', 'X', 'Y']
+
+attribsSynList = {entities[0] : resAttribsSyn, entities[1] : ocuAttribsSyn,
+                 entities[2] : eduAttribsSyn, entities[3] : transpoAttribsSyn, 
+                 entities[4] : addressAttribsSyn}
+
+
 
 #Attribute lists for each entity - COLLOQUIAL, words as users will recognize them
-resAttribsCol = ['Resident ID', 'Birthplace', 'First Name', 'Last Name', 'Age',
+resAttribsCol = ['All', 'Resident ID', 'Birthplace', 'First Name', 'Last Name', 'Age',
                 'Gender', 'Longitude', 'Lattitude', 'Job Title']
-ocuAttribsCol = ['Job Title', 'Average Salary', 'Socio-economic Index'] 
-eduAttribsCol = ['Institute', 'Cost', 'Graduation Year', 'Longitude', 'Lattitude']
-transpoAttribsCol = ['Tranportation Type', 'Public Access (True/False)', 'Cost']
-addressAttribsCol = ['Lot Size', 'Population', 'Street Number & Name', 'City',
+ocuAttribsCol = ['All', 'Job Title', 'Average Salary', 'Socio-economic Index'] 
+eduAttribsCol = ['All',  'Institute', 'Cost', 'Graduation Year', 'Longitude', 'Lattitude']
+transpoAttribsCol = ['All',  'Tranportation Type', 'Public Access (True/False)', 'Cost']
+addressAttribsCol = [ 'All', 'Lot Size', 'Population', 'Street Number & Name', 'City',
                     'Longitude', 'Lattitude']
 
 
 
 
 #builds SQL query based on user input
-def build_sql_query():    
-    query = ""
+def build_sql_query():
+
+    global conditionsList
+
+
+    #SELECTION statement
+    query = "SELECT "
+
+    query += attributeSelection
+
     if(len(conditionsList)==0):
         query = "SELECT * FROM %s limit 10" % ', '.join(selections)
     else:
         #print("this is conditionsList: " , conditionsList)
         #print("this is conditionsList at element 0: " , conditionsList[0])
-        whereClause = "".join(conditionsList[0])
+
+       
+
+
+        #FROM statement
+
+
+        whereClauses = []
+        totalConditions = len(conditionsList) / 3
+
+        for i in range(0, totalConditions):
+            whereClauses[i] = "".join(conditionsList[0])
+
         #print("whereClause is :" , whereClause)
         query = "SELECT * FROM %s " % ', '.join(selections) + "WHERE %s limit 10" % "".join(whereClause)
         
@@ -151,7 +183,7 @@ def execute_sql_query():
 
       print("\n\n show me the query: ", build_sql_query())
 
-      cursor = g.conn.execute(build_sql_query())
+      cursor = g.conn.execute("SELECT * FROM Resident limit 10")
       for result in cursor:
           queryResult.append(result)  # can also be accessed using result[0]
       cursor.close() 
@@ -212,11 +244,13 @@ def index():
   global querySubmitted
 
   global selections
+  global specificSelections
   global conditionsList
   global queryResult
   global lat_long_data
   global savedConditionsList
   global savedSelections
+  global savedSpecificSelections
 
 
   #Initialize vars above if statement so context always has data to select
@@ -229,7 +263,9 @@ def index():
     #clears all lists to prepare for next query
     #but first saves them in case user wants to analyze previous results
     savedSelections = selections.copy()
+    savedSpecificSelections = specificSelections.copy()
     selections = []
+    specificSelections = []
 
     savedConditionsList = conditionsList.copy()
     conditionsList = []
@@ -269,8 +305,9 @@ def index():
   #data= names is not being used. 
   #selectionsVar is variable name in html
   #selections is variable name in server.py
-  context = dict(data = queryResult, points = lat_long_data, selectionsVar = selections, 
+  context = dict(data = queryResult, points = lat_long_data, selectionsVar = selections, selVarLen = len(selections),
                  conditionsVar = conditionsList, savedSelectionsVar = savedSelections,
+                 specificSelectionsVar = specificSelections, savedSpecificSelectionsVar = savedSpecificSelections,
                  rAS = resAttribsSyn, rAC = resAttribsCol, lenRA = len(resAttribsSyn),
                  oAS = ocuAttribsSyn, oAC = ocuAttribsCol, lenOA = len(ocuAttribsSyn),
                  eAS = eduAttribsSyn, eAC = eduAttribsCol, lenEA = len(eduAttribsSyn),
@@ -327,14 +364,28 @@ def indexLink():
 def select1():
   selection = request.form['Select1']
 
+  specificSelection = request.form['Select2']
+
   #checks for redundancies in return list
   redundant = False
   for i in range(0, len(selections)):
         if selection == selections[i]:
             redundant = True
 
-  if not redundant:
-    selections.append(selection) 
+  for i in range(0, len(specificSelections)):
+      if specificSelection == specificSelections[i]:
+        redundant = True
+
+  compatibleAttribue = False
+
+  for i in range(0,len(attribsSynList[selection])):
+    if specificSelection == attribsSynList[selection][i]:
+        compatibleAttribue = True
+
+
+  if not redundant and compatibleAttribue:
+    selections.append(selection)
+    specificSelections.append(specificSelection)
  
   return redirect('/')
 
@@ -406,12 +457,15 @@ def submitQueryTrue():
 def loadLastQuery():
     
     global selections
+    global specificSelections
     global conditionsList
     global savedConditionsList
     global savedSelections
+    global savedSpecificSelections
 
     if len(savedSelections) > 0:
         selections = savedSelections
+        specificSelections = savedSpecificSelections
 
     if len(savedConditionsList) > 0:
         conditionsList = savedConditionsList

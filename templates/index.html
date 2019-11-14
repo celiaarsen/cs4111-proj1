@@ -28,15 +28,56 @@
 		<option value="Occupation">Occupations</option>
 		<option value="Transport_Mode">Modes Of Transportation</option>
 	</select> 
+	
+	<select name="select2">
+		
+		<optgroup label="Resident Attributes">
+			{% for i in range(0, lenRA)%}
+			<option value={{rAS[i]}}>{{rAC[i]}}</option>
+			{% endfor %}
+		</optgroup>
+		
+
+		<optgroup label="Occupation Attributes">
+			{% for i in range(0, lenOA)%}
+			<option value={{oAS[i]}}>{{oAC[i]}}</option>
+			{% endfor %}
+		</optgroup>
+		
+		
+		<optgroup label="Education Attributes">
+			{% for i in range(0, lenEA)%}
+			<option value={{eAS[i]}}>{{eAC[i]}}</option>
+			{% endfor %}
+		</optgroup>
+		
+		
+		<optgroup label="Transportation Attributes">
+			{% for i in range(0, lenTA)%}
+			<option value={{tAS[i]}}>{{tAC[i]}}</option>
+			{% endfor %}
+		</optgroup>
+		
+		
+		<optgroup label="Address Attributes">
+			{% for i in range(0, lenEA)%}
+			<option value={{aAS[i]}}>{{aAC[i]}}</option>
+			{% endfor %}
+		</optgroup>
+	
+	
 <input type="submit" value="Add"></p>
+
+
+
 </form>
 
 		<div>
 		<!--this is how you print a list in html -->
 		<!--don't need to define selectionsVar earlier on-->
 
-		{% for n in selectionsVar %}
-		<div>{{n}}</div>
+		{% for i in range(0,selVarLen) %}
+		<div>{{selectionsVar[i]}} - {{specificSelectionsVar[i]}}</div>
 		{% endfor %}
 		</div>
 		
@@ -49,31 +90,31 @@
 		<!--giving label to sublist of attributes-->
 		<!--for loop going thru all the attributes for Resident-->
 		<optgroup label="Resident Attributes">
-			{% for i in range(0, lenRA)%}
+			{% for i in range(1, lenRA)%}
 			<option value={{rAS[i]}}>{{rAC[i]}}</option>
 			{% endfor %}
 		</optgroup>
 		
 		<optgroup label="Occupation Attributes">
-			{% for i in range(0, lenOA)%}
+			{% for i in range(1, lenOA)%}
 			<option value={{oAS[i]}}>{{oAC[i]}}</option>
 			{% endfor %}
 		</optgroup>
 		
 		<optgroup label="Education Attributes">
-			{% for i in range(0, lenEA)%}
+			{% for i in range(1, lenEA)%}
 			<option value={{eAS[i]}}>{{eAC[i]}}</option>
 			{% endfor %}
 		</optgroup>
 		
 		<optgroup label="Transportation Attributes">
-			{% for i in range(0, lenTA)%}
+			{% for i in range(1, lenTA)%}
 			<option value={{tAS[i]}}>{{tAC[i]}}</option>
 			{% endfor %}
 		</optgroup>
 		
 		<optgroup label="Address Attributes">
-			{% for i in range(0, lenEA)%}
+			{% for i in range(1, lenEA)%}
 			<option value={{aAS[i]}}>{{aAC[i]}}</option>
 			{% endfor %}
 		</optgroup>
@@ -84,6 +125,8 @@
 		<option value="=">=</option>
 		<option value="<"><</option>
 		<option value=">">></option>
+		<option value="<="><=</option>
+		<option value=">=">>=</option>
 		<option value="!=">!=</option>
 		<option value="contains">Contains</option>
 		<option value=" ">All (no conditions)</option>
@@ -97,7 +140,7 @@
 
 <form method="POST" action="/submitQuery">
 
-	<input type="submit" value="Submit Query"></p>
+	<input type="submit" value="Submit Query">
 	
 </form>
 
@@ -124,31 +167,31 @@
 	
 	
 		{% if 'Resident' in savedSelectionsVar %}
-			{% for i in range(0, lenRA)%}
+			{% for i in range(1, lenRA)%}
 			<th>{{rAC[i]}}</th>
 			{% endfor %}
 		{% endif %}
 		
 		{% if 'Occupation' in savedSelectionsVar %}
-			{% for i in range(0, lenOA)%}
+			{% for i in range(1, lenOA)%}
 			<th>{{oAC[i]}}</th>
 			{% endfor %}
 		{% endif %}
 		
 		{% if 'Education' in savedSelectionsVar %}
-			{% for i in range(0, lenEA)%}
+			{% for i in range(1, lenEA)%}
 			<th>{{eAC[i]}}</th>
 			{% endfor %}
 		{% endif %}
 		
 		{% if 'Transport_Mode' in savedSelectionsVar %}
-			{% for i in range(0, lenTA)%}
+			{% for i in range(1, lenTA)%}
 			<th>{{tAC[i]}}</th>
 			{% endfor %}
 		{% endif %}
 		
 		{% if 'Address' in savedSelectionsVar %}
-			{% for i in range(0, lenEA)%}
+			{% for i in range(1, lenEA)%}
 			<th>{{aAC[i]}}</th>
 			{% endfor %}
 		{% endif %}
@@ -221,14 +264,14 @@
               var latNum = Number(lat.replace(/[^0-9\.-]+/g,""))
               var lngNum = Number(lng.replace(/[^0-9\.-]+/g,""))
               
-              <!--console.log(latNum)
-              <!--console.log(lngNum)
+              console.log(latNum)
+              console.log(lngNum)
               
               var residentXY = {lat: latNum, lng: lngNum}
-              <!--console.log(residentXY)
+              console.log(residentXY)
               
               pointList.push(residentXY)
-              <!--console.log(pointList)
+              console.log(pointList)
          
           }
           return pointList
