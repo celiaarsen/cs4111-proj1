@@ -274,6 +274,7 @@ def index():
   print(request.args)
 
   global querySubmitted
+  global warning
 
   global selections
   global specificSelections
@@ -305,13 +306,13 @@ def index():
     #bool must be turned back to false so queries dont run every other time
     querySubmitted = False
       
-    print("\n\n Shoe me saved selections: ", savedSelections)
+    print("\n\n Show me saved selections: ", savedSelections)
 
   #data= names is not being used. 
   #selectionsVar is variable name in html
   #selections is variable name in server.py
   context = dict(data = queryResult, points = lat_long_data, selectionsVar = selections, selVarLen = len(selections),
-                 conditionsVar = conditionsList, savedSelectionsVar = savedSelections,
+                 conditionsVar = conditionsList, savedSelectionsVar = savedSelections, warningVar = warning,
                  specificSelectionsVar = specificSelections, savedSpecificSelectionsVar = savedSpecificSelections,
                  rAS = resAttribsSyn, rAC = resAttribsCol, lenRA = len(resAttribsSyn),
                  oAS = ocuAttribsSyn, oAC = ocuAttribsCol, lenOA = len(ocuAttribsSyn),
@@ -391,9 +392,11 @@ def conditions():
 
     global specificSelections
     global selections
+    global warning
 
     singlecondition = []
-    
+    addConditionBool = False
+
     #print("the compare value: ", request.form['compareValue'])
     #print("the compare class: ", request.form['compareClass'])
     singlecondition.append(request.form['compareClass'])
@@ -407,15 +410,31 @@ def conditions():
         else:
             singlecondition.append(request.form['compareValue'])
             
-        conditionsList.append(singlecondition) 
-    print("this is the singlecondition", singlecondition)
+        aaddConditionBool = True
+
+    else:
+       warning += "Please add a condition  |  "
+
+    
+
+    #print("this is the singlecondition", singlecondition)
     
     #If we are requesting an attribute that is not in the SELECT table, 
     #we should add it to selections 
     if(get_attribute_table(request.form['compareClass']) not in selections):
-        print("table was added to selections bc db needs to join")
-        selections.append(get_attribute_table(request.form['compareClass']))
-        specificSelections.append("*")
+        if(len( set(selections) ) < 2):
+            print("table was added to selections bc db needs to join")
+            selections.append(get_attribute_table(request.form['compareClass']))
+            specificSelections.append("*")
+        else:
+            warning += "Sorry, cant add selection because condtion value is not apart of existing selections  |  "
+            addConditionBool = False;
+    else:
+        addConditionBool = True
+
+    if addConditionBool:
+         conditionsList.append(singlecondition)
+         warning = ""
 
     return redirect('/')
 
@@ -474,8 +493,12 @@ def submitQueryTrue():
     global selections
     global orderBy
     global limiter
+
+    global warning
     
     querySubmitted = True
+    warning = ""
+
     if (len(selections) > 0 ):       
         try:
             orderBy = request.form['orderBy']
