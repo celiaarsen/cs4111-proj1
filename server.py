@@ -170,19 +170,18 @@ def build_sql_query():
         #print("\n\n query after selection: ", query)
 
         from_where_clauses = ("", "")
-        muliTables = True
 
         if("education" in selections):
             from_where_clauses = join_resident_education()            
 
         elif("occupation" in selections):
-            from_where_clauses = join_resident_education()            
+            from_where_clauses = join_resident_occupation()            
 
         elif("transport_mode" in selections):
-            from_where_clauses = join_resident_education()            
+            from_where_clauses = join_resident_travel()            
 
         elif("address" in selections):
-            from_where_clauses = join_resident_education()            
+            from_where_clauses = join_resident_address()            
 
         else:
             from_where_clauses = ("Residents", "")
@@ -192,6 +191,7 @@ def build_sql_query():
         #print("\n\n query after From: ", query)
 
         #WHERE condition
+        query += " WHERE %s" % from_where_clauses[1]
 
     if(len(conditionsList) > 0):
 
@@ -210,7 +210,7 @@ def build_sql_query():
             
     if(orderBy!=""):
 
-        query += " ORDER BY " + orderBy + " limit " + limiter
+        query += " ORDER BY " + "resident." +orderBy + " limit " + limiter
         
         #print("\n\n query after ORDER BY: ", query)
     
@@ -416,6 +416,7 @@ def conditions():
 
     #print("the compare value: ", request.form['compareValue'])
     #print("the compare class: ", request.form['compareClass'])
+    singlecondition.append(get_attribute_table(request.form['compareClass'])+'.')
     singlecondition.append(request.form['compareClass'])
     singlecondition.append(request.form['compareSign'])
     #If the attribute that we are putting the condition on is a string 
@@ -427,7 +428,7 @@ def conditions():
         else:
             singlecondition.append(request.form['compareValue'])
             
-        aaddConditionBool = True
+        addConditionBool = True
 
     else:
        warning += "Please add a condition  |  "
