@@ -224,24 +224,27 @@ def execute_sql_query():
 
 #takes data that have been selected and makes a list of dictionaries
 def lat_lng_to_list(data):
+    print()
+    print()
+    print('making lat long list')
 
     global selections
 
-    if (selections[0] == "Resident") and (specificSelections[0] == "*") :
+    if (selections[0] == "resident") and (specificSelections[0] == "*") :
         LAT_INDEX = 7
         LNG_INDEX = 6
         lat_long_list = []
         for row in data:
             location = {'lat':row[LAT_INDEX], 'lng': row[LNG_INDEX]}
             lat_long_list.append(location)
-    elif (selections[0] == "Address") and (specificSelections[0] == "*") :
+    elif (selections[0] == "address") and (specificSelections[0] == "*") :
         LAT_INDEX = 5
         LNG_INDEX = 4
         lat_long_list = []
         for row in data:
             location = {'lat':row[LAT_INDEX], 'lng': row[LNG_INDEX]}
             lat_long_list.append(location)
-    elif (selections[0] == "Education") and (specificSelections[0] == "*") :
+    elif (selections[0] == "education") and (specificSelections[0] == "*") :
         LAT_INDEX = 2
         LNG_INDEX = 1
         lat_long_list = []
@@ -250,7 +253,8 @@ def lat_lng_to_list(data):
             lat_long_list.append(location)
     else:
         lat_long_list = []
-
+    
+    print(lat_long_list)
     return lat_long_list    
 
 
@@ -373,7 +377,7 @@ def select1():
 
 
   if (not redundant) and compatibleAttribue:
-    selections.append(selection)
+    selections.append(selection.lower())
     specificSelections.append(specificSelection)
  
   return redirect('/')
@@ -474,12 +478,17 @@ def submitQueryTrue():
     global selections
     global orderBy
     global limiter
-
-    if (len(selections) > 0):
-        querySubmitted = True
-
-        orderBy = request.form['orderBy']
-        limiter = request.form['numberOfRecords']
+    
+    querySubmitted = True
+    if (len(selections) > 0 ):       
+        try:
+            orderBy = request.form['orderBy']
+        except:
+            pass
+        try:
+            limiter = request.form['numberOfRecords']
+        except:
+            pass
 
     return redirect('/')
 
