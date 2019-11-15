@@ -23,10 +23,16 @@
 	<select name="select1">
     	<!--when you have a form and a number of boxes,  -->
 		<option value="Resident">Residents</option>
+		
+		<!-- bye bye other options
+		
 		<option value="Address">Addresses</option>
 		<option value="Education">Education Institutions</option>
 		<option value="Occupation">Occupations</option>
 		<option value="Transport_Mode">Modes Of Transportation</option>
+		
+		-->
+		
 	</select> 
 	
 	<select name="select2">
@@ -34,34 +40,6 @@
 		<optgroup label="Resident Attributes">
 			{% for i in range(0, lenRA)%}
 			<option value={{rAS[i]}}>{{rAC[i]}}</option>
-			{% endfor %}
-		</optgroup>
-		
-
-		<optgroup label="Occupation Attributes">
-			{% for i in range(0, lenOA)%}
-			<option value={{oAS[i]}}>{{oAC[i]}}</option>
-			{% endfor %}
-		</optgroup>
-		
-		
-		<optgroup label="Education Attributes">
-			{% for i in range(0, lenEA)%}
-			<option value={{eAS[i]}}>{{eAC[i]}}</option>
-			{% endfor %}
-		</optgroup>
-		
-		
-		<optgroup label="Transportation Attributes">
-			{% for i in range(0, lenTA)%}
-			<option value={{tAS[i]}}>{{tAC[i]}}</option>
-			{% endfor %}
-		</optgroup>
-		
-		
-		<optgroup label="Address Attributes">
-			{% for i in range(0, lenEA)%}
-			<option value={{aAS[i]}}>{{aAC[i]}}</option>
 			{% endfor %}
 		</optgroup>
 	
@@ -152,7 +130,7 @@
 
 	<select name="orderBy">
 		
-		{% if 'Resident' in selectionsVar %}
+		{% if 'resident' in selectionsVar %}
 		<optgroup label="Resident Attributes">
 			{% for i in range(1, lenRA)%}
 			<option value={{rAS[i]}}>{{rAC[i]}}</option>
@@ -222,11 +200,11 @@
 	<!-- Adds Header row-->
 	
 	
-		{% if 'Resident' in savedSelectionsVar %}
+		
 			{% for i in range(1, lenRA)%}
 			<th>{{rAC[i]}}</th>
 			{% endfor %}
-		{% endif %}
+
 		
 		{% if 'Occupation' in savedSelectionsVar %}
 			{% for i in range(1, lenOA)%}
@@ -367,6 +345,41 @@
 
 <!-- Might be useful...
 
+
+
+
+
+<!-- bye bye other options
+
+		<optgroup label="Occupation Attributes">
+			{% for i in range(0, lenOA)%}
+			<option value={{oAS[i]}}>{{oAC[i]}}</option>
+			{% endfor %}
+		</optgroup>
+		
+		
+		<optgroup label="Education Attributes">
+			{% for i in range(0, lenEA)%}
+			<option value={{eAS[i]}}>{{eAC[i]}}</option>
+			{% endfor %}
+		</optgroup>
+		
+		
+		<optgroup label="Transportation Attributes">
+			{% for i in range(0, lenTA)%}
+			<option value={{tAS[i]}}>{{tAC[i]}}</option>
+			{% endfor %}
+		</optgroup>
+		
+		
+		<optgroup label="Address Attributes">
+			{% for i in range(0, lenEA)%}
+			<option value={{aAS[i]}}>{{aAC[i]}}</option>
+			{% endfor %}
+		</optgroup>
+
+
+
 <form method="POST" action="/grouping">
 	<p>Indicate Data Ordering, Grouping, and Number of Records:</p>
 	
@@ -415,53 +428,7 @@
 	</select>
 	
 	
-<select name="orderBy">
-		
-		{% if 'Resident' in selectionsVar %}
-		<optgroup label="Resident Attributes">
-			{% for i in range(0, lenRA)%}
-			<option value={{rAS[i]}}>{{rAC[i]}}</option>
-			{% endfor %}
-		</optgroup>
-		{% endif %}
-		
-		{% if 'Occupation' in selectionsVar %}
-		<optgroup label="Occupation Attributes">
-			{% for i in range(0, lenOA)%}
-			<option value={{oAS[i]}}>{{oAC[i]}}</option>
-			{% endfor %}
-		</optgroup>
-		{% endif %}
-		
-		{% if 'Education' in selectionsVar %}
-		<optgroup label="Education Attributes">
-			{% for i in range(0, lenEA)%}
-			<option value={{eAS[i]}}>{{eAC[i]}}</option>
-			{% endfor %}
-		</optgroup>
-		{% endif %}
-		
-		{% if 'Transport_Mode' in selectionsVar %}
-		<optgroup label="Transportation Attributes">
-			{% for i in range(0, lenTA)%}
-			<option value={{tAS[i]}}>{{tAC[i]}}</option>
-			{% endfor %}
-		</optgroup>
-		{% endif %}
-		
-		{% if 'Address' in selectionsVar %}
-		<optgroup label="Address Attributes">
-			{% for i in range(0, lenEA)%}
-			<option value={{aAS[i]}}>{{aAC[i]}}</option>
-			{% endfor %}
-		</optgroup>
-		{% endif %}
 
-	</select>
-	
-	
-	<input type="text" name="numberOfRecords">
-	
 	<input type="submit" value="Submit Query"></p>
 
-
+-->

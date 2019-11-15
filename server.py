@@ -118,10 +118,10 @@ savedConditionsList = []
 entities = ['Resident', 'Address', 'Education', 'Occupation', 'Transport_Mode']
 
 #Attribute lists for each entity - SYNTATICAL, words exactly as syntax of sql database
-resAttribsSyn = ['*', 'r_id', 'birthplace', 'firstname', 'lastname', 'age', 'gender', 'X', 'Y', 'title']
+resAttribsSyn = ['*', 'r_id', 'birthplace', 'firstname', 'lastname', 'age', 'gender', 'x', 'y', 'title']
 ocuAttribsSyn = ['*', 'title', 'avg_salary', 'sei'] 
-eduAttribsSyn = ['*', 'institute', 'X', 'Y', 'cost']
-transpoAttribsSyn = ['*', 't_type', 'public_access', 'cost']
+eduAttribsSyn = ['*', 'institute', 'cost']
+transpoAttribsSyn = ['*', 't_type', 'public_access']
 addressAttribsSyn = ['*', 'lot_size', 'population', 'street_number', 'city', 'X', 'Y']
 
 attribsSynList = {entities[0] : resAttribsSyn, entities[1] : ocuAttribsSyn,
@@ -134,8 +134,8 @@ attribsSynList = {entities[0] : resAttribsSyn, entities[1] : ocuAttribsSyn,
 resAttribsCol = ['All', 'Resident ID', 'Birthplace', 'First Name', 'Last Name', 'Age',
                 'Gender(1,2)', 'Longitude', 'Latitude', 'Job Title']
 ocuAttribsCol = ['All', 'Job Title', 'Average Salary', 'Socio-economic Index'] 
-eduAttribsCol = ['All',  'Institute', 'Longitude', 'Latitude', 'Cost']
-transpoAttribsCol = ['All',  'Tranportation Type', 'Public Access (True/False)', 'Cost']
+eduAttribsCol = ['All',  'Institute', 'Cost']
+transpoAttribsCol = ['All',  'Tranportation Type', 'Public Access (True/False)']
 addressAttribsCol = [ 'All', 'Lot Size', 'Population', 'Street Number & Name', 'City',
                     'Longitude', 'Latitude']
 
@@ -156,7 +156,7 @@ def build_sql_query():
 
     selectStar = False
     if(len(selections)!=0):
-        print( "this is selections: " , selections)
+        #print( "this is selections: " , selections)
         for i in range(0, len(specificSelections)):
             if specificSelections[i] == "*":
                 selectStar = True
@@ -166,13 +166,13 @@ def build_sql_query():
         else:
             for i  in range(0, len(specificSelections)):
                 query += selections[i] + "." + specificSelections[i] + " "
-        print("this is specific selections: ", specificSelections)    
-        print("\n\n query after selection: ", query)
+        #print("this is specific selections: ", specificSelections)    
+        #print("\n\n query after selection: ", query)
 
                
         query += " FROM %s" % ','.join(selections)
 
-        print("\n\n query after From: ", query)
+        #print("\n\n query after From: ", query)
 
         #WHERE condition
 
@@ -195,7 +195,7 @@ def build_sql_query():
 
         query += " ORDER BY " + orderBy + " limit " + limiter
         
-        print("\n\n query after ORDER BY: ", query)
+        #print("\n\n query after ORDER BY: ", query)
     
     return query
 
@@ -226,7 +226,7 @@ def execute_sql_query():
 def lat_lng_to_list(data):
     print()
     print()
-    print('making lat long list')
+    #print('making lat long list')
 
     global selections
 
@@ -254,7 +254,7 @@ def lat_lng_to_list(data):
     else:
         lat_long_list = []
     
-    print(lat_long_list)
+    #print(lat_long_list)
     return lat_long_list    
 
 
@@ -305,7 +305,8 @@ def index():
     #bool must be turned back to false so queries dont run every other time
     querySubmitted = False
       
- 
+    print("\n\n Shoe me saved selections: ", savedSelections)
+
   #data= names is not being used. 
   #selectionsVar is variable name in html
   #selections is variable name in server.py
@@ -388,6 +389,9 @@ def select1():
 @app.route('/conditions', methods=['POST'])
 def conditions():
 
+    global specificSelections
+    global selections
+
     singlecondition = []
     
     #print("the compare value: ", request.form['compareValue'])
@@ -411,6 +415,7 @@ def conditions():
     if(get_attribute_table(request.form['compareClass']) not in selections):
         print("table was added to selections bc db needs to join")
         selections.append(get_attribute_table(request.form['compareClass']))
+        specificSelections.append("*")
 
     return redirect('/')
 
@@ -461,15 +466,6 @@ def get_attribute_table(attribute):
         
 addressAttribsSyn 
 
-
-@app.route('/grouping', methods=['POST'])
-def grouping():
-
-    #method needs to be written
-
-    #within this method, the SQL query must be submitted to the database and the results returned
-
-    return redirect('/')
 
 @app.route('/submitQuery', methods=['POST'])
 def submitQueryTrue():
