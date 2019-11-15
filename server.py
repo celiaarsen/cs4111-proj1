@@ -118,7 +118,7 @@ savedConditionsList = []
 entities = ['Resident', 'Address', 'Education', 'Occupation', 'Transport_Mode']
 
 #Attribute lists for each entity - SYNTATICAL, words exactly as syntax of sql database
-resAttribsSyn = ['*', 'r_id', 'birthplace', 'firstName', 'lastName', 'age', 'gender', 'X', 'Y', 'title']
+resAttribsSyn = ['*', 'r_id', 'birthplace', 'firstname', 'lastname', 'age', 'gender', 'X', 'Y', 'title']
 ocuAttribsSyn = ['*', 'title', 'avg_salary', 'sei'] 
 eduAttribsSyn = ['*', 'institute', 'X', 'Y', 'cost']
 transpoAttribsSyn = ['*', 't_type', 'public_access', 'cost']
@@ -132,9 +132,9 @@ attribsSynList = {entities[0] : resAttribsSyn, entities[1] : ocuAttribsSyn,
 
 #Attribute lists for each entity - COLLOQUIAL, words as users will recognize them
 resAttribsCol = ['All', 'Resident ID', 'Birthplace', 'First Name', 'Last Name', 'Age',
-                'Gender(1,2)', 'Longitude', 'Lattitude', 'Job Title']
+                'Gender(1,2)', 'Longitude', 'Latitude', 'Job Title']
 ocuAttribsCol = ['All', 'Job Title', 'Average Salary', 'Socio-economic Index'] 
-eduAttribsCol = ['All',  'Institute', 'Longitude', 'Lattitude', 'Cost']
+eduAttribsCol = ['All',  'Institute', 'Longitude', 'Latitude', 'Cost']
 transpoAttribsCol = ['All',  'Tranportation Type', 'Public Access (True/False)', 'Cost']
 addressAttribsCol = [ 'All', 'Lot Size', 'Population', 'Street Number & Name', 'City',
                     'Longitude', 'Lattitude']
@@ -156,26 +156,27 @@ def build_sql_query():
     query = "SELECT "
 
     selectStar = False
+    if(len(selections)!=0):
+        print( "this is selections: " , selections)
+        for i in range(0, len(specificSelections)):
+            if specificSelections[i] == "*":
+                selectStar = True
 
-    for i in range(0, len(specificSelections)):
-         if specificSelections[i] == "*":
-             selectStar = True
+        if selectStar:
+            query += "*"
+        else:
+            for i  in range(0, len(specificSelections)):
+                query += selections[i] + "." + specificSelections[i] + " "
+        print("this is specific selections: ", specificSelections)    
+        print("\n\n query after selection: ", query)
 
-    if selectStar:
-        query += "*"
-    else:
-        for i  in range(0, len(specificSelections)):
-            query += selections[i] + "." + specificSelections[i] + " "
-    
-    print("\n\n query after selection: ", query)
+        #FROM statement
 
-    #FROM statement
+        query += " FROM %s" % ','.join(selections)
 
-    query += " FROM %s" % ','.join(selections)
+        print("\n\n query after From: ", query)
 
-    print("\n\n query after From: ", query)
-
-    #WHERE condition
+        #WHERE condition
 
     if(len(conditionsList) > 0):
 
@@ -189,12 +190,15 @@ def build_sql_query():
                 query += "AND "
 
              query+= "".join(conditionsList[i])
+            
+        print("\n\n query after WHERE: ", query)   
+            
+    if(orderBy!=""):
 
-    query += " ORDER BY " + orderBy + " limit " + limiter
+        query += " ORDER BY " + orderBy + " limit " + limiter
         
-
-    print("\n\n query after WHERE: ", query)
-
+        print("\n\n query after ORDER BY: ", query)
+    
     return query
 
 
@@ -299,36 +303,7 @@ def index():
     #bool must be turned back to false so queries dont run every other time
     querySubmitted = False
       
-  #
-  # Flask uses Jinja templates, which is an extension to HTML where you can
-  # pass data to a template and dynamically generate HTML based on the data
-  # (you can think of it as simple PHP)
-  # documentation: https://realpython.com/blog/python/primer-on-jinja-templating/
-  #
-  # You can see an example template in templates/index.html
-  #
-  # context are the variables that are passed to the template.
-  # for example, "data" key in the context variable defined below will be 
-  # accessible as a variable in index.html:
-  #
-  #     # will print: [u'grace hopper', u'alan turing', u'ada lovelace']
-  #     <div>{{data}}</div>
-  #     
-  #     # creates a <div> tag for each element in data
-  #     # will print: 
-  #     #
-  #     #   <div>grace hopper</div>
-  #     #   <div>alan turing</div>
-  #     #   <div>ada lovelace</div>
-  #     #
-  #     {% for n in data %}
-  #     <div>{{n}}</div>
-  #     {% endfor %}
-  #
-
-  #print("\n\n Whats in selVarLen, selections, specificSelections?",
-        #selections, specificSelections, len(selections))
-
+ 
   #data= names is not being used. 
   #selectionsVar is variable name in html
   #selections is variable name in server.py
@@ -342,10 +317,9 @@ def index():
                  aAS = addressAttribsSyn, aAC = addressAttribsCol, lenAA = len(addressAttribsSyn))
 
 
-  #
+
   # render_template looks in the templates/ folder for files.
   # for example, the below file reads template/index.html
-  #
 
   #homepage is now set to index
   #**locals()
@@ -360,25 +334,6 @@ def index():
 # The functions for each app.route need to have different names
 #
   
-
-
-#Allows web app to route to home page through html
-@app.route('/another')
-def another():
-  return render_template("another.html")
-
-
-#Allows web app to route to home page through html
-@app.route('/home')
-def home():
-    return render_template("home.html")
-
-#Allows web app to route to index page through html
-@app.route('/index')
-def indexLink():
-  return render_template("index.html")
-
-
 #request.form[] is an array of all forms created in the html templates
 #a dictionary was created above which allows us to parse the array with
 #the name of the form as set in the html docs
@@ -437,26 +392,29 @@ def conditions():
     singlecondition.append(request.form['compareSign'])
     #If the attribute that we are putting the condition on is a string 
     #in the database, we need single quotes around the compare value
-    if(attribute_is_str(request.form['compareClass'])):
-        singlecondition.append("'"+request.form['compareValue']+"'")
-    else:
-        singlecondition.append(request.form['compareValue'])
+    print("the compare value: ", request.form['compareValue'])
+    if(request.form['compareValue']!=""):
+        if(attribute_is_str(request.form['compareClass'])):
+            singlecondition.append("'"+request.form['compareValue']+"'")
+        else:
+            singlecondition.append(request.form['compareValue'])
             
-    conditionsList.append(singlecondition) 
+        conditionsList.append(singlecondition) 
     
     #print("this is the conditions added: ", singlecondition)
 
     return redirect('/')
 
 #helper method. Checks if an attribute is a string in the Database
-def attribute_is_str(attribute):
+def attribute_is_str(attribute): 
+    
     #print('the compareClass, or attricute is called ' , attribute)
     sqlQuery_getDataType = "SELECT data_type FROM information_schema.columns"
-    sqlQuery_getDataType += " WHERE table_name = %s" % "".join("'"+selections[0].lower()+"'")
+    sqlQuery_getDataType += " WHERE table_name = %s" % "".join("'"+get_attribute_table(attribute)+"'")
     sqlQuery_getDataType += " AND column_name = %s" % "".join("'"+attribute+"'")
     
     print()
-    #print('the sqlQuery_getDataType statement is', sqlQuery_getDataType)
+    print('the sqlQuery_getDataType statement is', sqlQuery_getDataType)
     
     cursor = g.conn.execute(sqlQuery_getDataType)
     attribute_DataType = re.sub('[^A-Za-z0-9]+', '', str(cursor.next()))
@@ -467,7 +425,29 @@ def attribute_is_str(attribute):
         print('datatype was NOT CHAR')
         print('the datatype was', attribute_DataType)
         return False
-    
+ 
+#helper method
+#In the conditions, we get the attribute, but not the table the attribute is from,
+#and sometimes we need that information, especially if that attribute is not the table
+#we want to select from
+#This approach is a BANDAID and not a fix, bc there are attributes in multiple tables with
+#the same names
+def get_attribute_table(attribute):
+    if (attribute in resAttribsSyn):
+        return "resident"
+    elif (attribute in ocuAttribsSyn):
+        return "occupation"
+    elif (attribute in eduAttribsSyn):
+        return "education"
+    elif (attribute in transpoAttribsSyn):
+        return "transport_mode"
+    else:
+        return "travels_by"
+        
+addressAttribsSyn 
+
+#we need to know which table the attribute we are putting the condition on is from
+#call that variable attributeTable, the table from which the attribute must be pulled
 @app.route('/grouping', methods=['POST'])
 def grouping():
 
@@ -488,8 +468,8 @@ def submitQueryTrue():
     if (len(selections) > 0):
         querySubmitted = True
 
-    orderBy = request.form['orderBy']
-    limiter = request.form['numberOfRecords']
+        orderBy = request.form['orderBy']
+        limiter = request.form['numberOfRecords']
 
     return redirect('/')
 
