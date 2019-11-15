@@ -137,8 +137,7 @@ ocuAttribsCol = ['All', 'Job Title', 'Average Salary', 'Socio-economic Index']
 eduAttribsCol = ['All',  'Institute', 'Longitude', 'Latitude', 'Cost']
 transpoAttribsCol = ['All',  'Tranportation Type', 'Public Access (True/False)', 'Cost']
 addressAttribsCol = [ 'All', 'Lot Size', 'Population', 'Street Number & Name', 'City',
-                    'Longitude', 'Lattitude']
-
+                    'Longitude', 'Latitude']
 
 
 
@@ -171,7 +170,13 @@ def build_sql_query():
         print("\n\n query after selection: ", query)
 
         #FROM statement
-
+        #If there were conditions set on an attribute that isn't in the select
+        #clause, it needs to be added to the FROM clause
+        if(len(conditionsList)>0):     
+            attribute_table_name = get_attribute_table(request.form['compareValue'])
+            if(attribute_table_name not in selections):
+                selections.append(attribute_table_name)
+                
         query += " FROM %s" % ','.join(selections)
 
         print("\n\n query after From: ", query)
@@ -387,8 +392,8 @@ def select1():
 def conditions():
 
     singlecondition = []
-
-    singlecondition.append(request.form['compareClass'])
+    
+    singlecondition.append(get_attribute_table(request.form['compareValue']))
     singlecondition.append(request.form['compareSign'])
     #If the attribute that we are putting the condition on is a string 
     #in the database, we need single quotes around the compare value
@@ -401,6 +406,8 @@ def conditions():
             
         conditionsList.append(singlecondition) 
     
+    #If we are requesting an attribute that is not in the SELECT table, 
+    #we should add it to selections 
     #print("this is the conditions added: ", singlecondition)
 
     return redirect('/')
@@ -446,8 +453,7 @@ def get_attribute_table(attribute):
         
 addressAttribsSyn 
 
-#we need to know which table the attribute we are putting the condition on is from
-#call that variable attributeTable, the table from which the attribute must be pulled
+
 @app.route('/grouping', methods=['POST'])
 def grouping():
 
