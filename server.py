@@ -202,7 +202,7 @@ def build_sql_query():
         #print("this is conditionsList: " , conditionsList)
         #print("this is conditionsList at element 0: " , conditionsList[0])
         
-        query += " AND "
+        query += " WHERE "
 
         for i in range(0, len(conditionsList)):
              if i > 0:
@@ -309,7 +309,7 @@ def index():
 
   #Initialize vars above if statement so context always has data to select
 
-  if (querySubmitted and len(selections)>0):
+  if (querySubmitted):
     queryResult = execute_sql_query()
     lat_long_data = lat_lng_to_list(queryResult)
 
@@ -374,6 +374,8 @@ def select1():
   global specificSelections
   global attribsSynList
 
+  global warning
+
   selection = request.form['select1']
 
   specificSelection = request.form['select2']
@@ -402,6 +404,11 @@ def select1():
   if (not redundant) and compatibleAttribue:
     selections.append(selection.lower())
     specificSelections.append(specificSelection)
+    warning = ""
+  else:
+    warning += "Selection was redundant "
+
+    
  
   return redirect('/')
 
@@ -548,10 +555,11 @@ def submitQueryTrue():
 
     global warning
     
-    querySubmitted = True
-    warning = ""
 
-    if (len(selections) > 0 ):       
+    if (len(selections) > 0 ):
+        querySubmitted = True
+        warning = ""
+
         try:
             orderBy = request.form['orderBy']
         except:
@@ -560,10 +568,13 @@ def submitQueryTrue():
             limiter = request.form['numberOfRecords']
         except:
             pass
+    else:
+        warning += "Please make a selection ;)"
 
     return redirect('/')
 
 
+#In 94
 @app.route('/loadLastQuery', methods=['POST'])
 def loadLastQuery():
     
