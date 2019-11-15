@@ -155,49 +155,53 @@ def build_sql_query():
     query = "SELECT "
 
     selectStar = False
-    if(len(selections)!=0):
-        #print( "this is selections: " , selections)
-        for i in range(0, len(specificSelections)):
-            if specificSelections[i] == "*":
-                selectStar = True
+    multiTable=True
+    #print( "this is selections: " , selections)
+    for i in range(0, len(specificSelections)):
+       if specificSelections[i] == "*":
+           selectStar = True
 
-        if selectStar:
-            query += "*"
-        else:
-            for i  in range(0, len(specificSelections)):
-                query += selections[0] + "." + specificSelections[i] + " "
-        #print("this is specific selections: ", specificSelections)    
-        #print("\n\n query after selection: ", query)
+    if selectStar:
+        query += "*"
+    else:
+        for i  in range(0, len(specificSelections)):
+            query += selections[0] + "." + specificSelections[i] + " "
+    #print("this is specific selections: ", specificSelections)    
+    #print("\n\n query after selection: ", query)
 
-        from_where_clauses = ("", "")
+    from_where_clauses = ("", "")
 
-        if("education" in selections):
-            from_where_clauses = join_resident_education()            
+    if("education" in selections):
+        from_where_clauses = join_resident_education()            
 
-        elif("occupation" in selections):
-            from_where_clauses = join_resident_occupation()            
+    elif("occupation" in selections):
+        from_where_clauses = join_resident_occupation()            
 
-        elif("transport_mode" in selections):
-            from_where_clauses = join_resident_travel()            
+    elif("transport_mode" in selections):
+        from_where_clauses = join_resident_travel()            
 
-        elif("address" in selections):
-            from_where_clauses = join_resident_address()            
+    elif("address" in selections):
+        from_where_clauses = join_resident_address()            
 
-        else:
-            from_where_clauses = ("Residents", "")
+    else:
+        multiTable=False
+        from_where_clauses = ("resident", "")
 
-        query += " FROM %s" % from_where_clauses[0]
+    query += " FROM %s" % from_where_clauses[0]
 
-        #print("\n\n query after From: ", query)
+    #print("\n\n query after From: ", query)
 
-        #WHERE condition
+    #WHERE condition
+    if(multiTable):
         query += " WHERE %s" % from_where_clauses[1]
-
-    if(len(conditionsList) > 0):
-
+        
+    if(multiTable and len(conditionsList) > 0):
+        query += "AND"
+        
+    if(not multiTable and len(conditionsList) > 0):      
         #print("this is conditionsList: " , conditionsList)
         #print("this is conditionsList at element 0: " , conditionsList[0])
-
+        
         query += " AND "
 
         for i in range(0, len(conditionsList)):
@@ -305,7 +309,7 @@ def index():
 
   #Initialize vars above if statement so context always has data to select
 
-  if querySubmitted:
+  if (querySubmitted and len(selections)>0):
     queryResult = execute_sql_query()
     lat_long_data = lat_lng_to_list(queryResult)
 
@@ -413,48 +417,50 @@ def conditions():
 
     singlecondition = []
     addConditionBool = False
-
-    #print("the compare value: ", request.form['compareValue'])
-    #print("the compare class: ", request.form['compareClass'])
-    singlecondition.append(get_attribute_table(request.form['compareClass'])+'.')
-    singlecondition.append(request.form['compareClass'])
-    singlecondition.append(request.form['compareSign'])
-    #If the attribute that we are putting the condition on is a string 
-    #in the database, we need single quotes around the compare value
     
-    if(request.form['compareValue']!="" and request.form['compareClass']!=""):
-        if(attribute_is_str(request.form['compareClass'])):
-            singlecondition.append("'"+request.form['compareValue']+"'")
+    if(len(selections)>0):
+        #print("the compare value: ", request.form['compareValue'])
+        #print("the compare class: ", request.form['compareClass'])
+        singlecondition.append(get_attribute_table(request.form['compareClass'])+'.')
+        singlecondition.append(request.form['compareClass'])
+        singlecondition.append(request.form['compareSign'])
+        #If the attribute that we are putting the condition on is a string 
+        #in the database, we need single quotes around the compare value
+        
+        if(request.form['compareValue']!="" and request.form['compareClass']!=""):
+            if(attribute_is_str(request.form['compareClass'])):
+                singlecondition.append("'"+request.form['compareValue']+"'")
+            else:
+                singlecondition.append(request.form['compareValue'])
+                
+            addConditionBool = True
+    
         else:
-            singlecondition.append(request.form['compareValue'])
-            
-        addConditionBool = True
-
-    else:
-       warning += "Please add a condition  |  "
-
+           warning += "Please add a condition  |  "
     
-
-    #print("this is the singlecondition", singlecondition)
+        
     
-    #If we are requesting an attribute that is not in the SELECT table, 
-    #we should add it to selections 
-    if(get_attribute_table(request.form['compareClass']) not in selections):
-
-        if(len( set(selections) ) < 2):
-            print("table was added to selections bc db needs to join")
-            selections.append(get_attribute_table(request.form['compareClass']))
-            specificSelections.append("*")
+        #print("this is the singlecondition", singlecondition)
+        
+        #If we are requesting an attribute that is not in the SELECT table, 
+        #we should add it to selections 
+        if(get_attribute_table(request.form['compareClass']) not in selections):
+    
+            if(len( set(selections) ) < 2):
+                print("table was added to selections bc db needs to join")
+                selections.append(get_attribute_table(request.form['compareClass']))
+                specificSelections.append("*")
+            else:
+                warning += "Sorry, cant add selection because condtion value is not apart of existing selections  |  "
+                addConditionBool = False;
         else:
-            warning += "Sorry, cant add selection because condtion value is not apart of existing selections  |  "
-            addConditionBool = False;
+            addConditionBool = True
+    
+        if addConditionBool:
+             conditionsList.append(singlecondition)
+             warning = ""
     else:
-        addConditionBool = True
-
-    if addConditionBool:
-         conditionsList.append(singlecondition)
-         warning = ""
-
+        warning += "Please add a selection ;)"
     return redirect('/')
 
 
