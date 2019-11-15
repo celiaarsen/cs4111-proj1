@@ -169,14 +169,7 @@ def build_sql_query():
         print("this is specific selections: ", specificSelections)    
         print("\n\n query after selection: ", query)
 
-        #FROM statement
-        #If there were conditions set on an attribute that isn't in the select
-        #clause, it needs to be added to the FROM clause
-        if(len(conditionsList)>0):     
-            attribute_table_name = get_attribute_table(request.form['compareValue'])
-            if(attribute_table_name not in selections):
-                selections.append(attribute_table_name)
-                
+               
         query += " FROM %s" % ','.join(selections)
 
         print("\n\n query after From: ", query)
@@ -393,22 +386,27 @@ def conditions():
 
     singlecondition = []
     
-    singlecondition.append(get_attribute_table(request.form['compareValue']))
+    #print("the compare value: ", request.form['compareValue'])
+    #print("the compare class: ", request.form['compareClass'])
+    singlecondition.append(request.form['compareClass'])
     singlecondition.append(request.form['compareSign'])
     #If the attribute that we are putting the condition on is a string 
     #in the database, we need single quotes around the compare value
-    print("the compare value: ", request.form['compareValue'])
-    if(request.form['compareValue']!=""):
+    
+    if(request.form['compareValue']!="" and request.form['compareClass']!=""):
         if(attribute_is_str(request.form['compareClass'])):
             singlecondition.append("'"+request.form['compareValue']+"'")
         else:
             singlecondition.append(request.form['compareValue'])
             
         conditionsList.append(singlecondition) 
+    print("this is the singlecondition", singlecondition)
     
     #If we are requesting an attribute that is not in the SELECT table, 
     #we should add it to selections 
-    #print("this is the conditions added: ", singlecondition)
+    if(get_attribute_table(request.form['compareClass']) not in selections):
+        print("table was added to selections bc db needs to join")
+        selections.append(get_attribute_table(request.form['compareClass']))
 
     return redirect('/')
 
@@ -439,17 +437,23 @@ def attribute_is_str(attribute):
 #we want to select from
 #This approach is a BANDAID and not a fix, bc there are attributes in multiple tables with
 #the same names
-def get_attribute_table(attribute):
+def get_attribute_table(attribute):    
+    attribute = str(attribute)
+
     if (attribute in resAttribsSyn):
+        print('resident')
         return "resident"
     elif (attribute in ocuAttribsSyn):
+        print('occupation')
         return "occupation"
     elif (attribute in eduAttribsSyn):
+        print('education')
         return "education"
     elif (attribute in transpoAttribsSyn):
+        print('transport')
         return "transport_mode"
     else:
-        return "travels_by"
+        return ""
         
 addressAttribsSyn 
 
