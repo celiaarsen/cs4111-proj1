@@ -165,12 +165,13 @@ def build_sql_query():
             query += "*"
         else:
             for i  in range(0, len(specificSelections)):
-                query += selections[i] + "." + specificSelections[i] + " "
+                query += selections[0] + "." + specificSelections[i] + " "
         #print("this is specific selections: ", specificSelections)    
         #print("\n\n query after selection: ", query)
 
-               
-        query += " FROM %s" % ','.join(selections)
+        if("education" in selections):
+            from_where_clauses = join_resident_education()            
+            query += " FROM %s" % from_where_clauses[0]
 
         #print("\n\n query after From: ", query)
 
@@ -413,11 +414,11 @@ def conditions():
     #If we are requesting an attribute that is not in the SELECT table, 
     #we should add it to selections 
     if(get_attribute_table(request.form['compareClass']) not in selections):
-        print("table was added to selections bc db needs to join")
         selections.append(get_attribute_table(request.form['compareClass']))
         specificSelections.append("*")
 
     return redirect('/')
+
 
 #helper method. Checks if an attribute is a string in the Database
 def attribute_is_str(attribute): 
@@ -464,7 +465,33 @@ def get_attribute_table(attribute):
     else:
         return ""
         
-addressAttribsSyn 
+def join_resident_education():
+    selectFrom = "resident, attended, education"
+    join_conditions = "resident.r_id=attended.r_id AND attended.institute=education.institute"
+    
+    join_education_info = (selectFrom, join_conditions)
+    return join_education_info
+
+def join_resident_occupation():
+    selectFrom = "resident, occupation"
+    join_conditions = "resident.title = occupation.title"
+    
+    join_occupation_info = (selectFrom, join_conditions)
+    return join_occupation_info
+
+def join_resident_travel():
+    selectFrom = "resident, travels_by, transport_mode"
+    join_conditions = "resident.r_id=travels_by.r_id AND travels_by.t_type=transport_mode.t_type"
+    
+    join_travel_info = (selectFrom, join_conditions)
+    return join_travel_info
+
+def join_resident_address():
+    selectFrom = "resident, address"
+    join_conditions = "resident.x=address.x AND resident.y=address.y"
+    
+    join_address_info = (selectFrom, join_conditions)
+    return join_address_info 
 
 
 @app.route('/submitQuery', methods=['POST'])
