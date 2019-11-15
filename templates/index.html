@@ -240,13 +240,13 @@
       /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
       #map {
-        height: 80%;
+        height: 100%;
       }
       /* Optional: Makes the map fill the window. */
       html, body {
-        height: 80%;
-        margin: 0;
-        padding: 0;
+        height: 100%;
+        margin: 10;
+        padding: 10;
       }
     </style>
   </head>
@@ -305,12 +305,15 @@
       }
       
        
-    </script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCGxQ5Stz1p-ItVk1m1uZV0Xq7LoXE2eEE&callback=initMap"
+    </script> -->
+     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCGxQ5Stz1p-ItVk1m1uZV0Xq7LoXE2eEE&callback=initMap"
       type="text/javascript">
     </script>
  
- 
+<div> </div>
+<div> </div>
+<div> </div>
+
 </body>
 
 
@@ -318,92 +321,3 @@
 
 
 
-<!-- Might be useful...
-
-
-
-
-
-<!-- bye bye other options
-
-		<optgroup label="Occupation Attributes">
-			{% for i in range(0, lenOA)%}
-			<option value={{oAS[i]}}>{{oAC[i]}}</option>
-			{% endfor %}
-		</optgroup>
-		
-		
-		<optgroup label="Education Attributes">
-			{% for i in range(0, lenEA)%}
-			<option value={{eAS[i]}}>{{eAC[i]}}</option>
-			{% endfor %}
-		</optgroup>
-		
-		
-		<optgroup label="Transportation Attributes">
-			{% for i in range(0, lenTA)%}
-			<option value={{tAS[i]}}>{{tAC[i]}}</option>
-			{% endfor %}
-		</optgroup>
-		
-		
-		<optgroup label="Address Attributes">
-			{% for i in range(0, lenEA)%}
-			<option value={{aAS[i]}}>{{aAC[i]}}</option>
-			{% endfor %}
-		</optgroup>
-
-
-
-<form method="POST" action="/grouping">
-	<p>Indicate Data Ordering, Grouping, and Number of Records:</p>
-	
-	<select name="groupBy">
-		
-		{% if 'Resident' in selectionsVar %}
-		<optgroup label="Resident Attributes">
-			{% for i in range(0, lenRA)%}
-			<option value={{rAS[i]}}>{{rAC[i]}}</option>
-			{% endfor %}
-		</optgroup>
-		{% endif %}
-		
-		{% if 'Occupation' in selectionsVar %}
-		<optgroup label="Occupation Attributes">
-			{% for i in range(0, lenOA)%}
-			<option value={{oAS[i]}}>{{oAC[i]}}</option>
-			{% endfor %}
-		</optgroup>
-		{% endif %}
-		
-		{% if 'Education' in selectionsVar %}
-		<optgroup label="Education Attributes">
-			{% for i in range(0, lenEA)%}
-			<option value={{eAS[i]}}>{{eAC[i]}}</option>
-			{% endfor %}
-		</optgroup>
-		{% endif %}
-		
-		{% if 'Transport_Mode' in selectionsVar %}
-		<optgroup label="Transportation Attributes">
-			{% for i in range(0, lenTA)%}
-			<option value={{tAS[i]}}>{{tAC[i]}}</option>
-			{% endfor %}
-		</optgroup>
-		{% endif %}
-		
-		{% if 'Address' in selectionsVar %}
-		<optgroup label="Address Attributes">
-			{% for i in range(0, lenEA)%}
-			<option value={{aAS[i]}}>{{aAC[i]}}</option>
-			{% endfor %}
-		</optgroup>
-		{% endif %}
-
-	</select>
-	
-	
-
-	<input type="submit" value="Submit Query"></p>
-
--->

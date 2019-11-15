@@ -327,7 +327,7 @@ def index():
 
   if (querySubmitted):
     queryResultTuple = execute_sql_query()
-    lat_long_data = lat_lng_to_list(queryResult)
+    lat_long_data = lat_lng_to_list(queryResultTuple[0])
 
 
     #clears all lists to prepare for next query
@@ -519,17 +519,15 @@ def get_attribute_table(attribute):
     attribute = str(attribute)
 
     if (attribute in resAttribsSyn):
-        print('resident')
         return "resident"
     elif (attribute in ocuAttribsSyn):
-        print('occupation')
         return "occupation"
     elif (attribute in eduAttribsSyn):
-        print('education')
         return "education"
     elif (attribute in transpoAttribsSyn):
-        print('transport')
         return "transport_mode"
+    elif (attribute in addressAttribsSyn):
+        return "address"
     else:
         return ""
         
