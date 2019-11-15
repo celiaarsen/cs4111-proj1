@@ -201,34 +201,12 @@
 	
 	
 		
-			{% for i in range(1, lenRA)%}
-			<th>{{rAC[i]}}</th>
+			{% for i in range(0, headerLength)%}
+			<th>{{dataHeader[i]}}</th>
 			{% endfor %}
 
 		
-		{% if 'Occupation' in savedSelectionsVar %}
-			{% for i in range(1, lenOA)%}
-			<th>{{oAC[i]}}</th>
-			{% endfor %}
-		{% endif %}
 		
-		{% if 'Education' in savedSelectionsVar %}
-			{% for i in range(1, lenEA)%}
-			<th>{{eAC[i]}}</th>
-			{% endfor %}
-		{% endif %}
-		
-		{% if 'Transport_Mode' in savedSelectionsVar %}
-			{% for i in range(1, lenTA)%}
-			<th>{{tAC[i]}}</th>
-			{% endfor %}
-		{% endif %}
-		
-		{% if 'Address' in savedSelectionsVar %}
-			{% for i in range(1, lenEA)%}
-			<th>{{aAC[i]}}</th>
-			{% endfor %}
-		{% endif %}
 	
 	
    {% for row in data %}

@@ -166,6 +166,9 @@ def build_sql_query():
     else:
         for i  in range(0, len(specificSelections)):
             query += selections[0] + "." + specificSelections[i] + " "
+            if(i < len(specificSelections) - 1):
+                query += ", "
+                
     #print("this is specific selections: ", specificSelections)    
     #print("\n\n query after selection: ", query)
 
@@ -196,7 +199,12 @@ def build_sql_query():
         query += " WHERE %s" % from_where_clauses[1]
         
     if(multiTable and len(conditionsList) > 0):
-        query += "AND"
+
+        for i in range(0, len(conditionsList)):
+             
+             query += " AND "
+
+             query+= "".join(conditionsList[i])
         
     if(not multiTable and len(conditionsList) > 0):      
         #print("this is conditionsList: " , conditionsList)
@@ -206,7 +214,7 @@ def build_sql_query():
 
         for i in range(0, len(conditionsList)):
              if i > 0:
-                query += "AND "
+                query += " AND "
 
              query+= "".join(conditionsList[i])
             
@@ -233,13 +241,19 @@ def execute_sql_query():
       print("\n\n show me the query: ", query)
 
       cursor = g.conn.execute(query)
+
+      print("\n\n Give me the cursor cols, ", cursor.keys())
+
       for result in cursor:
           queryResult.append(result)  # can also be accessed using result[0]
       cursor.close() 
+
+      queryResultTuple = (queryResult, cursor.keys())
+
   #for debugging
   #print("whats in queryResult: ", queryResult)
   
-  return queryResult
+  return queryResultTuple
  
 
 
@@ -309,8 +323,10 @@ def index():
 
   #Initialize vars above if statement so context always has data to select
 
+  queryResultTuple = ("", [])
+
   if (querySubmitted):
-    queryResult = execute_sql_query()
+    queryResultTuple = execute_sql_query()
     lat_long_data = lat_lng_to_list(queryResult)
 
 
@@ -332,7 +348,8 @@ def index():
   #data= names is not being used. 
   #selectionsVar is variable name in html
   #selections is variable name in server.py
-  context = dict(data = queryResult, points = lat_long_data, selectionsVar = selections, selVarLen = len(selections),
+  context = dict(data = queryResultTuple[0], dataHeader = queryResultTuple[1], headerLength = len(queryResultTuple[1]),
+                 points = lat_long_data, selectionsVar = selections, selVarLen = len(selections),
                  conditionsVar = conditionsList, savedSelectionsVar = savedSelections, warningVar = warning,
                  specificSelectionsVar = specificSelections, savedSpecificSelectionsVar = savedSpecificSelections,
                  rAS = resAttribsSyn, rAC = resAttribsCol, lenRA = len(resAttribsSyn),
@@ -425,7 +442,7 @@ def conditions():
     singlecondition = []
     addConditionBool = False
     
-    if(len(selections)>0):
+    if(len(selections)>0 and request.form['compareValue']!=""):
         #print("the compare value: ", request.form['compareValue'])
         #print("the compare class: ", request.form['compareClass'])
         singlecondition.append(get_attribute_table(request.form['compareClass'])+'.')
