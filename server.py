@@ -169,9 +169,25 @@ def build_sql_query():
         #print("this is specific selections: ", specificSelections)    
         #print("\n\n query after selection: ", query)
 
+        from_where_clauses = ("", "")
+        muliTables = True
+
         if("education" in selections):
             from_where_clauses = join_resident_education()            
-            query += " FROM %s" % from_where_clauses[0]
+
+        elif("occupation" in selections):
+            from_where_clauses = join_resident_education()            
+
+        elif("transport_mode" in selections):
+            from_where_clauses = join_resident_education()            
+
+        elif("address" in selections):
+            from_where_clauses = join_resident_education()            
+
+        else:
+            from_where_clauses = ("Residents", "")
+
+        query += " FROM %s" % from_where_clauses[0]
 
         #print("\n\n query after From: ", query)
 
@@ -182,7 +198,7 @@ def build_sql_query():
         #print("this is conditionsList: " , conditionsList)
         #print("this is conditionsList at element 0: " , conditionsList[0])
 
-        query += " WHERE "
+        query += " AND "
 
         for i in range(0, len(conditionsList)):
              if i > 0:
@@ -307,7 +323,7 @@ def index():
     #bool must be turned back to false so queries dont run every other time
     querySubmitted = False
       
-    print("\n\n Show me saved selections: ", savedSelections)
+    #print("\n\n Show me saved selections: ", savedSelections)
 
   #data= names is not being used. 
   #selectionsVar is variable name in html
@@ -437,10 +453,6 @@ def conditions():
     if addConditionBool:
          conditionsList.append(singlecondition)
          warning = ""
-
-        selections.append(get_attribute_table(request.form['compareClass']))
-        specificSelections.append("*")
-
 
     return redirect('/')
 
