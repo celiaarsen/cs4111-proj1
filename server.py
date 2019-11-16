@@ -288,20 +288,24 @@ def lat_lng_to_list(queryResultTuple):
     hasLat = False
    
     #here, we are setting the indices of x and y in query result
-    for i in range(0, len(data_keys)):   
-        if ( data_keys[i]=='x'):
+    print(data_keys)
+    i=0
+    while((not hasLong or not hasLat) and i < len(data_keys)):
+        if (data_keys[i]=='x'):
             x_key = i
             hasLong = True
     
         if (data_keys[i]=='y'):
             y_key = i
             hasLat = True
-            
+        i+=1
+         
     if(hasLong and hasLat):
         for row in data:
             location = {'lat':row[y_key], 'lng': row[x_key]}
             lat_long_list.append(location)
-
+    
+    print('x and y indices' , x_key, y_key)
     return lat_long_list
 
 
