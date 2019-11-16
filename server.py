@@ -458,7 +458,7 @@ def conditions():
     
     singlecondition = []
     addConditionBool = False
-    intAttributes = ["gender", "age", "cost", "avg_salary", "sei", "public_access"]
+    intAttributes = ["gender", "age", "cost", "avg_salary", "sei", "public_access", "population"]
     if(len(selections)>0 and request.form['compareValue']!=""):
         #print("the compare value: ", request.form['compareValue'])
         #print("the compare class: ", request.form['compareClass'])
