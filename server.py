@@ -458,10 +458,11 @@ def conditions():
     global specificSelections
     global selections
     global warning
-
+    
+    
     singlecondition = []
     addConditionBool = False
-    
+    intAttributes = ["gender", "age", "cost", "avg_salary", "sei", "public_access"]
     if(len(selections)>0 and request.form['compareValue']!=""):
         #print("the compare value: ", request.form['compareValue'])
         #print("the compare class: ", request.form['compareClass'])
@@ -474,15 +475,19 @@ def conditions():
         if(request.form['compareValue']!="" and request.form['compareClass']!=""):
             if(attribute_is_str(request.form['compareClass'])):
                  sanitized_value = re.sub('[^A-Za-z0-9-.]+', '', request.form['compareValue'])              
-                 singlecondition.append("'"+sanitized_value+"'")
-            else:  
+            elif(str(request.form['compareClass']) in intAttributes):  
                 sanitized_value = re.sub('[^A-Za-z0-9-.]+', '', request.form['compareValue'])
+                try:
+                    x = int(sanitized_value)
+                except:
+                    sanitized_value = -999
+            else:
                 try:
                     x = float(sanitized_value)
                 except:
                     sanitized_value = -999
-
-                singlecondition.append("'"+str(sanitized_value)+"'")
+                    
+            singlecondition.append("'"+str(sanitized_value)+"'")
                 
             addConditionBool = True
     
