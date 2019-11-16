@@ -277,40 +277,32 @@ def execute_sql_query():
 
 
 #takes data that have been selected and makes a list of dictionaries
-def lat_lng_to_list(data):
-    print()
-    print()
-    #print('making lat long list')
+def lat_lng_to_list(queryResultTuple):
+    data = queryResultTuple[0]
+    data_keys = queryResultTuple[1]
+    x_key = 0
+    y_key = 0
+    lat_long_list = []
 
-    global selections
-
-    if (selections[0] == "resident") and (specificSelections[0] == "*") :
-        LAT_INDEX = 7
-        LNG_INDEX = 6
-        lat_long_list = []
-        for row in data:
-            location = {'lat':row[LAT_INDEX], 'lng': row[LNG_INDEX]}
-            lat_long_list.append(location)
-    elif (selections[0] == "address") and (specificSelections[0] == "*") :
-        LAT_INDEX = 5
-        LNG_INDEX = 4
-        lat_long_list = []
-        for row in data:
-            location = {'lat':row[LAT_INDEX], 'lng': row[LNG_INDEX]}
-            lat_long_list.append(location)
-    elif (selections[0] == "education") and (specificSelections[0] == "*") :
-        LAT_INDEX = 2
-        LNG_INDEX = 1
-        lat_long_list = []
-        for row in data:
-            location = {'lat':row[LAT_INDEX], 'lng': row[LNG_INDEX]}
-            lat_long_list.append(location)
-    else:
-        lat_long_list = []
+    hasLong = False
+    hasLat = False
+   
+    #here, we are setting the indices of x and y in query result
+    for i in range(0, len(data_keys)):   
+        if ( data_keys[i]=='x'):
+            x_key = i
+            hasLong = True
     
-    #print(lat_long_list)
-    return lat_long_list    
+        if (data_keys[i]=='y'):
+            y_key = i
+            hasLat = True
+            
+    if(hasLong and hasLat):
+        for row in data:
+            location = {'lat':row[y_key], 'lng': row[x_key]}
+            lat_long_list.append(location)
 
+    return lat_long_list
 
 
 @app.route('/')
@@ -346,7 +338,7 @@ def index():
 
   if (querySubmitted):
     queryResultTuple = execute_sql_query()
-    lat_long_data = lat_lng_to_list(queryResultTuple[0])
+    lat_long_data = lat_lng_to_list(queryResultTuple)
 
 
     #clears all lists to prepare for next query
