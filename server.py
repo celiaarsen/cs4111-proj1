@@ -151,18 +151,38 @@ def build_sql_query():
     global limiter
 
 
+    print("\n In selections, saved selections at index i | ", specificSelections, " | ", selections)
+
+
     #SELECTION statement
     query = "SELECT "
 
+    #Value of Multitable is 1 or 2 gives 0 or 1 for multitable true or false 
     selectStar = False
-    multiTable=True
+    multiTable = len(set(selections)) - 1
+
     #print( "this is selections: " , selections)
     for i in range(0, len(specificSelections)):
-       if specificSelections[i] == "*":
+
+       if (specificSelections[i] == "*" and selections[i] == "resident"):
            selectStar = True
 
     if selectStar:
         query += "*"
+    elif (multiTable):
+
+        for i  in range(0, len(specificSelections)-1):
+            query += selections[0] + "." + specificSelections[i] + " "
+            if(i < len(specificSelections) - 2):
+                query += ", "
+
+        if (len(conditionsList) > 0):
+            query+= ", "
+            for i  in range(0, len(conditionsList)):
+                query += conditionsList[i][0] + conditionsList[i][1] + " "
+                if(i < len(conditionsList) - 1):
+                    query += ", "
+
     else:
         for i  in range(0, len(specificSelections)):
             query += selections[0] + "." + specificSelections[i] + " "
@@ -187,7 +207,6 @@ def build_sql_query():
         from_where_clauses = join_resident_address()            
 
     else:
-        multiTable=False
         from_where_clauses = ("resident", "")
 
     query += " FROM %s" % from_where_clauses[0]
@@ -425,7 +444,8 @@ def select1():
   else:
     warning += "Selection was redundant "
 
-    
+  
+  print("\n In selections, in /select, saved selections at index i | ", specificSelections, " | ", selections)
  
   return redirect('/')
 
@@ -453,9 +473,16 @@ def conditions():
         
         if(request.form['compareValue']!="" and request.form['compareClass']!=""):
             if(attribute_is_str(request.form['compareClass'])):
-                singlecondition.append("'"+request.form['compareValue']+"'")
-            else:
-                singlecondition.append(request.form['compareValue'])
+                 sanitized_value = re.sub('[^A-Za-z0-9-.]+', '', request.form['compareValue'])              
+                 singlecondition.append("'"+sanitized_value+"'")
+            else:  
+                sanitized_value = re.sub('[^A-Za-z0-9-.]+', '', request.form['compareValue'])
+                try:
+                    x = float(sanitized_value)
+                except:
+                    sanitized_value = -999
+
+                singlecondition.append("'"+str(sanitized_value)+"'")
                 
             addConditionBool = True
     
