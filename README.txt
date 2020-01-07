@@ -8,7 +8,9 @@ Jack Welsh - jhw2167
 To run: python3 server.py
 Go to: http://35.185.0.229:8111 in a web browser
 
-Note: the postgres database is not currently live, so data will not load if tested now (after 12/1/19)
+Notes: 
+-The postgres database is not currently live, so data will not load if tested now (after 12/1/19)
+-Replace line 301 in index.html with your Google Maps API Key
 *******************
 
 Project Goal:
